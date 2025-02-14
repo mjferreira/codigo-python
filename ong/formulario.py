@@ -67,27 +67,32 @@ def menuAtualizar():
 
 def menuDeletar():
     os.system("clear")
-    vid=input("Digite o ID do registro a ser deletado: ")
-    vsql="DELETE FROM tb_pessoa WHERE N_IDCONTATO="+vid
+    vid=input("Digite o ID a ser deletado: ")
+    vsql="DELETE FROM tb_pessoa WHERE N_ID="+vid
+    print(vsql)
     modificar(vcon,vsql)
 
 def menuConsultar():
-    print("Estou aqui")
     vsql="SELECT * FROM tb_pessoa"
     resultado=consultar(vcon,vsql)
     for r in resultado:
-        print("ID:{0:_<3} Nome:{1:_<30} RG:{2:_<15} CPF:{3:<11} MAE:{4:<30} CPF-MAE:{5:_<11} PAI:{4:<30} CPF-PAI:{5:_<11}".format(r[0],r[1],r[2],r[3],r[4],r[5],r[6],r[7]))
-
+        print("ID:{0:_<3} Nome:{1:_<30} RG:{2:_<15} CPF:{3:<11} MAE:{4:<30} CPF-MAE:{5:_<11} PAI:{6:<30} CPF-PAI:{7:_<11}".format(r[0],r[1],r[2],r[3],r[4],r[5],r[6],r[7]))
+    r=input("Digite qualquer tecla para continua...")
 
 def menuConsultarNome():
-    print()
+    vnome=input("Digite um nome para pesquisa: ")
+    vsql="SELECT * FROM tb_pessoa WHERE T_NOME LIKE '%"+vnome+"%'"
+    resultado=consultar(vcon,vsql)
+    for r in resultado:
+        print("ID:{0:_<3} Nome:{1:_<30} RG:{2:_<15} CPF:{3:<11} MAE:{4:<30} CPF-MAE:{5:_<11} PAI:{6:<30} CPF-PAI:{7:_<11}".format(r[0],r[1],r[2],r[3],r[4],r[5],r[6],r[7]))
+    r=input("Digite qualquer tecla para continua...")
 
 def modificar(conexao,sql):
     try:
         c=conexao.cursor()
         c.execute(sql)
         conexao.commit()
-    except Erro as ex:
+    except Error as ex:
         print(ex)
     finally:
         print("Operacao Realizada com sucesso")
@@ -118,6 +123,6 @@ while opcao != 6:
         print("Programa finalizado")
     else:
         os.system("clear")
-        print("Opcao Ainvalida")
+        print("Opcao Invalida")
         os.system("sleep 1")
 vcon.close()
