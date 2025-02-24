@@ -1,7 +1,7 @@
 import os
 import sqlite3
 from sqlite3 import Error
-import banco2
+import banco
 
 def menuprincipal():
     os.system("clear")
@@ -26,13 +26,13 @@ def menuInserir():
     #vsql= "INSERT INTO tb_pessoa (T_NOME, [N_RG], [N_CPF], T_MAE, [N_CPF-MAE], T_PAI, [N_CPF-PAI]) VALUES('"+vnome+"',(vrg),(vcpf),'"+vmae+"',(vcpfmae),'"+vpai+"',(vcpfpai)"
     vsql="INSERT INTO tb_pessoa (T_NOME, T_RG, T_CPF, T_MAE, T_CPFMAE, T_PAI, T_CPFPAI) VALUES ('%s', %s, %s, '%s', %s, '%s', %s)" %(vnome, vrg, vcpf, vmae, vcpfmae, vpai, vcpfpai)
 
-    atualizar(vcon,vsql)
+    banco.atualizar(vsql)
 
 def menuAtualizar():
     os.system("clear")
     vid=input("Digite o ID do registro a ser alterado: ")
     vsql="SELECT * FROM tb_pessoa WHERE N_ID="+vid
-    r=consultar(vcon,vsql)
+    r=banco.consultar(vsql)
     rnome=r[0][1]
     rrg=r[0][2]
     rcpf=r[0][3]
@@ -55,18 +55,18 @@ def menuAtualizar():
     if(len(vpai)==0): vpai=rpai
     if(len(vcpfpai)==0): vcpfpai=rcpfpai
     vsql= "UPDATE tb_pessoa SET T_NOME='"+vnome+"',T_RG='"+vrg+"',T_CPF='"+vcpf+"',T_MAE='"+vmae+"',T_CPFMAE='"+vcpfmae+"',T_PAI='"+vpai+"',T_CPFPAI='"+vcpfpai+"' WHERE N_ID="+vid
-    modificar(vcon,vsql)
+    banco.atualizar(vsql)
 
 def menuDeletar():
     os.system("clear")
     vid=input("Digite o ID a ser deletado: ")
     vsql="DELETE FROM tb_pessoa WHERE N_ID="+vid
     print(vsql)
-    modificar(vcon,vsql)
+    banco.atualizar(vsql)
 
 def menuConsultar():
     vsql="SELECT * FROM tb_pessoa"
-    resultado=consultar(vcon,vsql)
+    resultado=banco.consultar(vsql)
     for r in resultado:
         print("ID:{0:_<3} Nome:{1:_<30} RG:{2:_<15} CPF:{3:<11} MAE:{4:<30} CPF-MAE:{5:_<11} PAI:{6:<30} CPF-PAI:{7:_<11}".format(r[0],r[1],r[2],r[3],r[4],r[5],r[6],r[7]))
     r=input("Digite qualquer tecla para continua...")
@@ -74,7 +74,7 @@ def menuConsultar():
 def menuConsultarNome():
     vnome=input("Digite um nome para pesquisa: ")
     vsql="SELECT * FROM tb_pessoa WHERE T_NOME LIKE '%"+vnome+"%'"
-    resultado=consultar(vcon,vsql)
+    resultado=banco.consultar(vsql)
     for r in resultado:
         print("ID:{0:_<3} Nome:{1:_<30} RG:{2:_<15} CPF:{3:<11} MAE:{4:<30} CPF-MAE:{5:_<11} PAI:{6:<30} CPF-PAI:{7:_<11}".format(r[0],r[1],r[2],r[3],r[4],r[5],r[6],r[7]))
     r=input("Digite qualquer tecla para continua...")

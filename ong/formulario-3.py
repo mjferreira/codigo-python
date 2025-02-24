@@ -1,14 +1,27 @@
 import sys
 from PyQt6.QtWidgets import QApplication, QWidget, QPushButton, QLabel, QLineEdit, QMainWindow
 from PyQt6.QtGui import QAction
-def funcao1():
-    print("Nome:%s" % lenome.text())
-    print("RG:%s" % lerg.text())
-    print("CPf:%s" % lecpf.text())
-    print("Mae:%s" % lemae.text())
-    print("CPF Mae:%s" % lecpfmae.text())
-    print("Pai :%s" % lepai.text())
-    print("CPF Pai:%s" % lecpfpai.text())
+import banco
+
+def gravarDados():
+    vnome=lenome.text()
+    vrg=lerg.text()
+    vcpf=lecpf.text()
+    vmae=lemae.text()
+    vcpfmae=lecpfmae.text()
+    vpai=lepai.text()
+    vcpfpai=lecpfpai.text()
+    #vsql= "INSERT INTO tb_pessoa (T_NOME, [N_RG], [N_CPF], T_MAE, [N_CPF-MAE], T_PAI, [N_CPF-PAI]) VALUES('"+vnome+"',(vrg),(vcpf),'"+vmae+"',(vcpfmae),'"+vpai+"',(vcpfpai)"
+    vsql="INSERT INTO tb_pessoa (T_NOME, T_RG, T_CPF, T_MAE, T_CPFMAE, T_PAI, T_CPFPAI) VALUES ('%s', %s, %s, '%s', %s, '%s', %s)" %(vnome, vrg, vcpf, vmae, vcpfmae, vpai, vcpfpai)
+    banco.atualizar(vsql)
+    lenome.clear()
+    lerg.clear()
+    lecpf.clear()
+    lemae.clear()
+    lecpfmae.clear()
+    lepai.clear()
+    lecpfpai.clear()
+
 
 def funcao2():
     label.setText("Botao 2 pressionado")
@@ -24,10 +37,10 @@ class MinhaJanela(QMainWindow):
         super().__init__()
         self.resize(600,500)
         self.setWindowTitle("Ong Amazonia Vivia")
-        self.setStyleSheet("background-color: gray;")
+        self.setStyleSheet("background-color: lightblue;")
         # Criar a barra de menuInserir
         menu_bar = self.menuBar()
-        menu_bar.setStyleSheet("background-color: lightgray; color: black;") 
+        menu_bar.setStyleSheet("background-color: lightgray; color: black;")
         # Criar um menu "Arquivo"
         menu_arquivo = menu_bar.addMenu("Menu")
         # Criar ações para o menu
@@ -51,15 +64,15 @@ class MinhaJanela(QMainWindow):
 app = QApplication(sys.argv)
 janela = MinhaJanela()
 
-botao1 = QPushButton("Inserir",janela)
+botao1 = QPushButton("Gravar",janela)
 botao1.setGeometry(450,400,100,40)
 botao1.setStyleSheet('background-color:red;color:white')
-botao1.clicked.connect(funcao1)
+botao1.clicked.connect(gravarDados)
 
-# botao2 = QPushButton("Botao 2",janela)
-# botao2.setGeometry(250,700,100,40)
-# botao2.setStyleSheet('background-color:green;color:white')
-# botao2.clicked.connect(funcao2)
+botao2 = QPushButton("Voltar",janela)
+botao2.setGeometry(250,400,100,40)
+botao2.setStyleSheet('background-color:green;color:white')
+botao2.clicked.connect(funcao2)
 
 # botao3 = QPushButton("Botao 3",janela)
 # botao3.setGeometry(400,700,100,40)
@@ -67,13 +80,13 @@ botao1.clicked.connect(funcao1)
 # botao3.clicked.connect(funcao3)
 
 lnome = QLabel("Nome:",janela)
-lnome.move(100,100)
-lnome.setStyleSheet('font-size:16px')
+lnome.move(10,100)
+lnome.setStyleSheet('color: red; font-size:18px;')
 lenome = QLineEdit("",janela)
 lenome.setGeometry(155,100,400,20)
 
 lrg = QLabel("RG:",janela)
-lrg.move(100,130)
+lrg.move(10,130)
 lrg.setStyleSheet('font-size:16px')
 lerg = QLineEdit("",janela)
 lerg.setGeometry(155,130,120,20)
