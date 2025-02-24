@@ -26,7 +26,7 @@ def menuInserir():
     #vsql= "INSERT INTO tb_pessoa (T_NOME, [N_RG], [N_CPF], T_MAE, [N_CPF-MAE], T_PAI, [N_CPF-PAI]) VALUES('"+vnome+"',(vrg),(vcpf),'"+vmae+"',(vcpfmae),'"+vpai+"',(vcpfpai)"
     vsql="INSERT INTO tb_pessoa (T_NOME, T_RG, T_CPF, T_MAE, T_CPFMAE, T_PAI, T_CPFPAI) VALUES ('%s', %s, %s, '%s', %s, '%s', %s)" %(vnome, vrg, vcpf, vmae, vcpfmae, vpai, vcpfpai)
 
-    modificar(vcon,vsql)
+    atualizar(vcon,vsql)
 
 def menuAtualizar():
     os.system("clear")

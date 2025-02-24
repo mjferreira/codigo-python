@@ -3,7 +3,7 @@ import sqlite3
 from sqlite3 import Error
 
 def ConexaoBanco():
-    caminho="/home/marcelo/programacao/python/ong/ong.db"
+    caminho="/home/marcelo/programacao/codigo-python/ong/ong.db"
     con=None
     try:
         con=sqlite3.connect(caminho)
