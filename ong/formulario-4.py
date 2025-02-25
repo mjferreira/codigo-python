@@ -4,26 +4,6 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QVBoxLayout, QWid
 from PyQt6.QtGui import QAction
 import banco
 
-def gravarDados():
-    vnome=lenome.text()
-    vrg=lerg.text()
-    vcpf=lecpf.text()
-    vmae=lemae.text()
-    vcpfmae=lecpfmae.text()
-    vpai=lepai.text()
-    vcpfpai=lecpfpai.text()
-    #vsql= "INSERT INTO tb_pessoa (T_NOME, [N_RG], [N_CPF], T_MAE, [N_CPF-MAE], T_PAI, [N_CPF-PAI]) VALUES('"+vnome+"',(vrg),(vcpf),'"+vmae+"',(vcpfmae),'"+vpai+"',(vcpfpai)"
-    vsql="INSERT INTO tb_pessoa (T_NOME, T_RG, T_CPF, T_MAE, T_CPFMAE, T_PAI, T_CPFPAI) VALUES ('%s', %s, %s, '%s', %s, '%s', %s)" %(vnome, vrg, vcpf, vmae, vcpfmae, vpai, vcpfpai)
-    banco.atualizar(vsql)
-    lenome.clear()
-    lerg.clear()
-    lecpf.clear()
-    lemae.clear()
-    lecpfmae.clear()
-    lepai.clear()
-    lecpfpai.clear()
-
-
 def funcao2():
     label.setText("Botao 2 pressionado")
     label.adjustSize()
@@ -72,8 +52,7 @@ class MinhaJanela(QMainWindow):
         self.botao1.move(400,400)
         self.botao1.setVisible(False)
         self.botao1.setStyleSheet('background-color:red;color:white')
-        self.botao1.clicked.connect(gravarDados)
-
+        self.botao1.clicked.connect(self.gravarDados)
 
         self.botao2 = QPushButton("Voltar", self.central_widget)
         self.botao2.setFixedSize(80,30)
@@ -109,10 +88,9 @@ class MinhaJanela(QMainWindow):
         self.lecpf.setStyleSheet('background: white; color: black; font-size:18px;')
         self.lecpf.setGeometry(80,70,150,20)
 
-        self.linhacpf = QLabel("________Dados Pessoais_____________________",self.central_widget)
-        self.linhacpf.move(10,90)
-        self.linhacpf.setStyleSheet('color: black; font-size:16px')
-
+        # self.linhacpf = QLabel("________Dados Pessoais_____________________",self.central_widget)
+        # self.linhacpf.move(10,90)
+        # self.linhacpf.setStyleSheet('color: black; font-size:16px')
 
         self.lmae = QLabel("Mãe:",self.central_widget)
         self.lmae.move(10,120)
@@ -129,17 +107,18 @@ class MinhaJanela(QMainWindow):
         self.lecpfmae.setGeometry(80,150,150,20)
 
         self.lpai = QLabel("Pai:",self.central_widget)
-        self.lpai.move(100,270)
+        self.lpai.move(10,180)
         self.lpai.setStyleSheet('font-size:16px')
         self.lepai = QLineEdit("",self.central_widget)
-        self.lepai.setGeometry(180,270,400,20)
+        self.lepai.setStyleSheet('background: white; color: black; font-size:18px;')
+        self.lepai.setGeometry(80,180,400,20)
 
         self.lcpfpai = QLabel("CPF:",self.central_widget)
-        self.lcpfpai.move(100,300)
+        self.lcpfpai.move(10,210)
         self.lcpfpai.setStyleSheet('font-size:16px')
         self.lecpfpai = QLineEdit("",self.central_widget)
-        self.lecpfpai.setGeometry(180,300,150,20)
-
+        self.lecpfpai.setStyleSheet('background: white; color: black; font-size:18px;')
+        self.lecpfpai.setGeometry(80,210,150,20)
 
         self.lcpf.setVisible(False)
         self.lmae.setVisible(False)
@@ -151,8 +130,7 @@ class MinhaJanela(QMainWindow):
         self.lecpfmae.setVisible(False)
         self.lepai.setVisible(False)
         self.lecpfpai.setVisible(False)
-        self.linhacpf.setVisible(False)
-
+        # self.linhacpf.setVisible(False)
 
     def inserir(self):
         self.botao1.setVisible(True)
@@ -171,8 +149,29 @@ class MinhaJanela(QMainWindow):
         self.lecpfmae.setVisible(True)
         self.lepai.setVisible(True)
         self.lecpfpai.setVisible(True)
-        self.linhacpf.setVisible(True)
+        # self.linhacpf.setVisible(True)
 
+    def gravarDados(self):
+        vnome=self.lenome.text()
+        vrg=self.lerg.text()
+        vcpf=self.lecpf.text()
+        vmae=self.lemae.text()
+        vcpfmae=self.lecpfmae.text()
+        vpai=self.lepai.text()
+        vcpfpai=self.lecpfpai.text()
+        print(vcpfpai)
+        #vsql= "INSERT INTO tb_pessoa (T_NOME, [N_RG], [N_CPF], T_MAE, [N_CPF-MAE], T_PAI, [N_CPF-PAI]) VALUES('"+vnome+"',(vrg),(vcpf),'"+vmae+"',(vcpfmae),'"+vpai+"',(vcpfpai)"
+        vsql="INSERT INTO tb_pessoa (T_NOME, T_RG, T_CPF, T_MAE, T_CPFMAE, T_PAI, T_CPFPAI) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s')" %(vnome, vrg, vcpf, vmae, vcpfmae, vpai, vcpfpai)
+        print(vsql)
+        banco.atualizar(vsql)
+        print("Aqui.....")
+        self.lenome.clear()
+        self.lerg.clear()
+        self.lecpf.clear()
+        self.lemae.clear()
+        self.lecpfmae.clear()
+        self.lepai.clear()
+        self.lecpfpai.clear()
 
 app = QApplication(sys.argv)
 janela = MinhaJanela()
