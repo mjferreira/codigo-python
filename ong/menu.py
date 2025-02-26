@@ -1,81 +1,39 @@
 import sys
-import sqlite3
-from PyQt6.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QPushButton, QVBoxLayout, QWidget, QMessageBox
+from PyQt6.QtWidgets import QApplication, QMainWindow, QTableWidget, QPushButton, QVBoxLayout, QWidget
 
-class TabelaDados(QMainWindow):
+class MinhaJanela(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Browser de Tabela de Dados")
-        self.setGeometry(100, 100, 600, 400)
-        # self.setStyleSheet("background-color: lightgray; color black;")
+        self.setWindowTitle("Exemplo de Visibilidade da Tabela")
+        self.setGeometry(100, 100, 500, 300)
 
-
-        # Widget central
+        # Criar widget central
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
 
-        # Layout principal
+        # Criar layout
         layout = QVBoxLayout(self.central_widget)
 
-        # Criar a tabela
-        self.tabela = QTableWidget()
+        # Criar Tabela
+        self.tabela = QTableWidget(3, 3)  # 3 linhas, 3 colunas
+        self.tabela.setHorizontalHeaderLabels(["ID", "Nome", "Status"])
         layout.addWidget(self.tabela)
-        self.tabela.setStyleSheet("background-color: blue;")
 
+        # Criar Botão para Alternar Visibilidade
+        self.botao_toggle = QPushButton("Ocultar Tabela")
+        self.botao_toggle.clicked.connect(self.alternar_visibilidade)
+        layout.addWidget(self.botao_toggle)
 
-        # Conectar ao banco de dados e carregar os dados
-        self.carregar_dados()
-
-    def carregar_dados(self):
-        """Carrega os dados do banco na tabela"""
-        conexao = sqlite3.connect("ong.db")  # Conecta ao banco
-        cursor = conexao.cursor()
-
-        #cursor.execute("CREATE TABLE IF NOT EXISTS usuarios (id INTEGER PRIMARY KEY, nome TEXT, idade INTEGER)")
-        #cursor.execute("INSERT INTO usuarios (nome, idade) VALUES ('Carlos', 25), ('Ana', 30), ('Pedro', 22)")
-        #conexao.commit()
-
-        cursor.execute("SELECT N_ID, T_NOME, T_CPF FROM tb_pessoa")
-        dados = cursor.fetchall()
-
-        self.tabela.setRowCount(len(dados))
-        self.tabela.setColumnCount(5)  # ID, Nome, Idade, Ações
-        self.tabela.setHorizontalHeaderLabels(["ID", "Nome", "CPF", "Ações", ""])
-
-        for linha_idx, linha in enumerate(dados):
-            for col_idx, valor in enumerate(linha):
-                self.tabela.setItem(linha_idx, col_idx, QTableWidgetItem(str(valor)))
-
-            # Botão Editar
-            botao_editar = QPushButton("Editar")
-            botao_editar.clicked.connect(lambda _, row=linha[0]: self.editar_registro(row))
-            self.tabela.setCellWidget(linha_idx, 3, botao_editar)
-
-            # Botão Excluir
-            botao_excluir = QPushButton("Excluir")
-            botao_excluir.clicked.connect(lambda _, row=linha[0]: self.excluir_registro(row))
-            self.tabela.setCellWidget(linha_idx, 4, botao_excluir)
-
-        conexao.close()
-
-    def editar_registro(self, id_registro):
-        """Simula edição de um registro"""
-        QMessageBox.information(self, "Editar", f"Editar formulário de {id_registro}")
-
-    def excluir_registro(self, id_registro):
-        """Exclui um registro do banco de dados"""
-        resposta = QMessageBox.question(self, "Excluir", f"Tem certeza que deseja excluir o {id_registro}?",
-                                        QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-        if resposta == QMessageBox.StandardButton.Yes:
-            conexao = sqlite3.connect("ong.db")
-            cursor = conexao.cursor()
-            cursor.execute("DELETE FROM tb_pessoa WHERE N_ID = ?", (id_registro,))
-            conexao.commit()
-            conexao.close()
-            self.carregar_dados()  # Recarregar os dados após a exclusão
+    def alternar_visibilidade(self):
+        if self.tabela.isVisible():
+            self.tabela.setVisible(False)
+            self.botao_toggle.setText("Mostrar Tabela")
+        else:
+            self.tabela.setVisible(True)
+            self.botao_toggle.setText("Ocultar Tabela")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    janela = TabelaDados()
+    janela = MinhaJanela()
     janela.show()
     sys.exit(app.exec())

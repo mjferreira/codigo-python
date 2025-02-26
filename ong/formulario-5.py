@@ -1,16 +1,8 @@
 import sys
-from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QVBoxLayout, QWidget, QPushButton, QLineEdit, QHBoxLayout, QMessageBox
+from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QVBoxLayout, QWidget, QPushButton, QLineEdit, QHBoxLayout, QMessageBox, QTableWidget
+from PyQt6.QtWidgets import QTableWidgetItem
 from PyQt6.QtGui import QAction
 import banco
-
-def funcao2():
-    label.setText("Botao 2 pressionado")
-    label.adjustSize()
-
-def funcao3():
-    valor_lido = le.text()
-    label.setText(valor_lido)
-    label.adjustSize()
 
 class MinhaJanela(QMainWindow):
     def __init__(self):
@@ -32,6 +24,7 @@ class MinhaJanela(QMainWindow):
         acao_inserir = QAction("Inserir", self)
         acao_inserir.triggered.connect(self.inserir)
         acao_consultar = QAction("Consultar", self)
+        acao_consultar.triggered.connect(self.consultar)
         acao_sair = QAction("Sair", self)
 
         # Adicionar ações ao menu
@@ -150,6 +143,64 @@ class MinhaJanela(QMainWindow):
         self.lecpfpai.setVisible(False)
         # self.linhacpf.setVisible(False)
 
+        # Layout principal
+        layout = QVBoxLayout(self.central_widget)
+        self.tabela = QTableWidget()
+        layout.addWidget(self.tabela)
+        self.tabela.setStyleSheet("background-color: blue;")
+        self.tabela.setVisible(False)
+        # Criar Botão para Alternar Visibilidade
+        self.botao_toggle = QPushButton("Voltar")
+        self.botao_toggle.clicked.connect(self.ocultar_inserir)
+        layout.addWidget(self.botao_toggle)
+        self.botao_toggle.setVisible(False)
+        # self.tabela.setStyleSheet("QTableWidget { background-color: lightblue; color: black; }")  # Define a cor do texto para azul
+
+        self.carregar_dados()
+
+    def carregar_dados(self):
+
+        vsql = "SELECT N_ID, T_NOME, T_CPF FROM tb_pessoa order by T_NOME"
+        dados = banco.consultar(vsql)
+
+        self.tabela.setRowCount(len(dados))
+        self.tabela.setColumnCount(5)  # ID, Nome, Idade, Ações
+        self.tabela.setColumnWidth(0, 10)   # Coluna 0 com 50 pixels
+        self.tabela.setColumnWidth(1, 400)  # Coluna 1 com 150 pixels
+        self.tabela.setColumnWidth(2, 100)  # Coluna 2 com 100 pixels
+        self.tabela.setHorizontalHeaderLabels(["ID", "Nome", "CPF", "Ações", ""])
+
+        for linha_idx, linha in enumerate(dados):
+            for col_idx, valor in enumerate(linha):
+                self.tabela.setItem(linha_idx, col_idx, QTableWidgetItem(str(valor)))
+
+            # Botão Editar
+            botao_editar = QPushButton("Editar")
+            botao_editar.setStyleSheet("background-color: green; color white;")
+            botao_editar.clicked.connect(lambda _, row=linha[0]: self.editar_registro(row))
+            self.tabela.setCellWidget(linha_idx, 3, botao_editar)
+
+            # Botão Excluir
+            botao_excluir = QPushButton("Excluir")
+            botao_excluir.setStyleSheet("background-color: red; color white;")
+            botao_excluir.clicked.connect(lambda _, row=linha[0]: self.excluir_registro(row))
+            self.tabela.setCellWidget(linha_idx, 4, botao_excluir)
+
+
+
+    def editar_registro(self, id_registro):
+        """Simula edição de um registro"""
+        QMessageBox.information(self, "Editar", f"Editar formulário de {id_registro}")
+
+    def excluir_registro(self, id_registro):
+        """Exclui um registro do banco de dados"""
+        resposta = QMessageBox.question(self, "Excluir", f"Tem certeza que deseja excluir o {id_registro}?",
+                                        QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+        if resposta == QMessageBox.StandardButton.Yes:
+            vsql = "DELETE FROM tb_pessoa WHERE N_ID = "+ str(id_registro)
+            banco.atualizar(vsql)
+            self.carregar_dados()  # Recarregar os dados após a exclusão
+
     def inserir(self):
         self.botao1.setVisible(True)
         self.botao2.setVisible(True)
@@ -169,7 +220,13 @@ class MinhaJanela(QMainWindow):
         self.lecpfpai.setVisible(True)
         # self.linhacpf.setVisible(True)
 
+    def consultar(self):
+        self.tabela.setVisible(True)
+        self.botao_toggle.setVisible(True)
+
     def ocultar_inserir(self):
+        self.botao_toggle.setVisible(False)
+        self.tabela.setVisible(False)
         self.botao1.setVisible(False)
         self.botao2.setVisible(False)
         self.lnome.setVisible(False)
