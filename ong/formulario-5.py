@@ -32,15 +32,11 @@ class MinhaJanela(QMainWindow):
         acao_inserir = QAction("Inserir", self)
         acao_inserir.triggered.connect(self.inserir)
         acao_consultar = QAction("Consultar", self)
-        acao_modificar = QAction("Modificar", self)
-        acao_deletar = QAction("Deletar", self)
         acao_sair = QAction("Sair", self)
 
         # Adicionar ações ao menu
         menu_form.addAction(acao_inserir)
         menu_form.addAction(acao_consultar)
-        menu_form.addAction(acao_modificar)
-        menu_form.addAction(acao_deletar)
         menu_form.addSeparator()  # Adiciona uma linha separadora
         menu_form.addAction(acao_sair)
         # Conectar a ação "Sair" para fechar a janela

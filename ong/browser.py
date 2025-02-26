@@ -1,6 +1,7 @@
 import sys
 import sqlite3
 from PyQt6.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QPushButton, QVBoxLayout, QWidget, QMessageBox
+import banco
 
 class TabelaDados(QMainWindow):
     def __init__(self):
@@ -27,16 +28,9 @@ class TabelaDados(QMainWindow):
         self.carregar_dados()
 
     def carregar_dados(self):
-        """Carrega os dados do banco na tabela"""
-        conexao = sqlite3.connect("ong.db")  # Conecta ao banco
-        cursor = conexao.cursor()
 
-        #cursor.execute("CREATE TABLE IF NOT EXISTS usuarios (id INTEGER PRIMARY KEY, nome TEXT, idade INTEGER)")
-        #cursor.execute("INSERT INTO usuarios (nome, idade) VALUES ('Carlos', 25), ('Ana', 30), ('Pedro', 22)")
-        #conexao.commit()
-
-        cursor.execute("SELECT N_ID, T_NOME, T_CPF FROM tb_pessoa")
-        dados = cursor.fetchall()
+        vsql = "SELECT N_ID, T_NOME, T_CPF FROM tb_pessoa"
+        dados = banco.consultar(vsql)
 
         self.tabela.setRowCount(len(dados))
         self.tabela.setColumnCount(5)  # ID, Nome, Idade, Ações
@@ -56,8 +50,6 @@ class TabelaDados(QMainWindow):
             botao_excluir.clicked.connect(lambda _, row=linha[0]: self.excluir_registro(row))
             self.tabela.setCellWidget(linha_idx, 4, botao_excluir)
 
-        conexao.close()
-
     def editar_registro(self, id_registro):
         """Simula edição de um registro"""
         QMessageBox.information(self, "Editar", f"Editar formulário de {id_registro}")
@@ -67,11 +59,8 @@ class TabelaDados(QMainWindow):
         resposta = QMessageBox.question(self, "Excluir", f"Tem certeza que deseja excluir o {id_registro}?",
                                         QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
         if resposta == QMessageBox.StandardButton.Yes:
-            conexao = sqlite3.connect("ong.db")
-            cursor = conexao.cursor()
-            cursor.execute("DELETE FROM tb_pessoa WHERE N_ID = ?", (id_registro,))
-            conexao.commit()
-            conexao.close()
+            vsql = "DELETE FROM tb_pessoa WHERE N_ID = ?", (id_registro,)
+            banco.atualizar(vsql)
             self.carregar_dados()  # Recarregar os dados após a exclusão
 
 if __name__ == "__main__":
