@@ -1,39 +1,29 @@
-import sys
-from PyQt6.QtWidgets import QApplication, QMainWindow, QTableWidget, QPushButton, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QApplication, QWidget, QPushButton
+from PyQt6.QtGui import QIcon
+from PyQt6.QtCore import QSize
 
-class MinhaJanela(QMainWindow):
+class MinhaJanela(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Exemplo de Visibilidade da Tabela")
-        self.setGeometry(100, 100, 500, 300)
 
-        # Criar widget central
-        self.central_widget = QWidget()
-        self.setCentralWidget(self.central_widget)
+        # Definir título da janela
+        self.setWindowTitle("Exemplo de Botão com Ícone")
 
-        # Criar layout
-        layout = QVBoxLayout(self.central_widget)
+        # Criar o botão e definir o ícone
+        botao_ok = QPushButton(self)
+        icone = QIcon("trash-can-red.jpg")  # Substitua com o caminho do seu ícone
+        botao_ok.setIcon(icone)
+        botao_ok.setIconSize(QSize(32, 32))  # Tamanho do ícone
+        botao_ok.setText("")  # Remove o texto para mostrar apenas o ícone
 
-        # Criar Tabela
-        self.tabela = QTableWidget(3, 3)  # 3 linhas, 3 colunas
-        self.tabela.setHorizontalHeaderLabels(["ID", "Nome", "Status"])
-        layout.addWidget(self.tabela)
+        # Exibir a janela
+        self.show()
 
-        # Criar Botão para Alternar Visibilidade
-        self.botao_toggle = QPushButton("Ocultar Tabela")
-        self.botao_toggle.clicked.connect(self.alternar_visibilidade)
-        layout.addWidget(self.botao_toggle)
+# Inicializar a aplicação
+app = QApplication([])
 
-    def alternar_visibilidade(self):
-        if self.tabela.isVisible():
-            self.tabela.setVisible(False)
-            self.botao_toggle.setText("Mostrar Tabela")
-        else:
-            self.tabela.setVisible(True)
-            self.botao_toggle.setText("Ocultar Tabela")
+# Criar e exibir a janela
+janela = MinhaJanela()
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    janela = MinhaJanela()
-    janela.show()
-    sys.exit(app.exec())
+# Iniciar o loop de eventos da aplicação
+app.exec()

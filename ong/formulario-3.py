@@ -82,6 +82,7 @@ botao2.clicked.connect(funcao2)
 lnome = QLabel("Nome:",janela)
 lnome.move(10,100)
 lnome.setStyleSheet('color: red; font-size:18px;')
+
 lenome = QLineEdit("",janela)
 lenome.setGeometry(155,100,400,20)
 

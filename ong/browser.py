@@ -9,24 +9,17 @@ class TabelaDados(QMainWindow):
         self.setWindowTitle("Browser de Tabela de Dados")
         self.setGeometry(100, 100, 800, 600)
         # self.setStyleSheet("background-color: lightgray; color black;")
-
-
         # Widget central
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
-
         # Layout principal
         layout = QVBoxLayout(self.central_widget)
-
         # Criar a tabela
         self.tabela = QTableWidget()
         layout.addWidget(self.tabela)
         self.tabela.setStyleSheet("background-color: blue;")
         # self.tabela.setStyleSheet("QTableWidget { background-color: lightblue; color: black; }")  # Define a cor do texto para azul
 
-
-
-        # Conectar ao banco de dados e carregar os dados
         self.carregar_dados()
 
     def carregar_dados(self):

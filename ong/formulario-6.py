@@ -1,7 +1,8 @@
 import sys
 from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QVBoxLayout, QWidget, QPushButton, QLineEdit, QHBoxLayout, QMessageBox, QTableWidget
 from PyQt6.QtWidgets import QTableWidgetItem
-from PyQt6.QtGui import QAction
+from PyQt6.QtGui import QAction, QIcon
+from PyQt6.QtCore import QSize
 import banco
 
 class MinhaJanela(QMainWindow):
@@ -36,7 +37,6 @@ class MinhaJanela(QMainWindow):
         # Conectar a ação "Sair" para fechar a janela
         acao_sair.triggered.connect(self.close)
 
-
         menu_sobre = menu_bar.addMenu("Sobre")
         # Criar ações para o menu
         acao_mostrar = QAction("Versão", self)
@@ -44,20 +44,12 @@ class MinhaJanela(QMainWindow):
         # Adicionar ações ao menu
         menu_sobre.addAction(acao_mostrar)
 
-        # Criando um label e botão para a mensagem de versão (inicialmente ocultos)
-        self.label_versao = QLabel("Versão 1.0.0", self.central_widget)
-        self.label_versao.move(150, 250)
-        self.label_versao.setVisible(False)
-        self.label_versao.setStyleSheet('background-color:green;color:white')
-
-
         self.botao_ok = QPushButton("OK", self.central_widget)
         self.botao_ok.move(200, 280)
         self.botao_ok.setFixedSize(80, 30)
         self.botao_ok.setVisible(False)
         self.botao_ok.setStyleSheet('background-color:blue;color:white')
         self.botao_ok.clicked.connect(self.ocultar_mensagem_versao)
-
 
         self.botao1 = QPushButton("Gravar", self.central_widget)
         self.botao1.setFixedSize(80, 30)
@@ -132,74 +124,82 @@ class MinhaJanela(QMainWindow):
         self.lecpfpai.setStyleSheet('background: white; color: black; font-size:18px;')
         self.lecpfpai.setGeometry(80,210,150,25)
 
-        self.lcpf.setVisible(False)
-        self.lmae.setVisible(False)
-        self.lcpfmae.setVisible(False)
-        self.lpai.setVisible(False)
-        self.lcpfpai.setVisible(False)
-        self.lecpf.setVisible(False)
-        self.lemae.setVisible(False)
-        self.lecpfmae.setVisible(False)
-        self.lepai.setVisible(False)
-        self.lecpfpai.setVisible(False)
-        # self.linhacpf.setVisible(False)
 
         # Layout principal
         layout = QVBoxLayout(self.central_widget)
         self.tabela = QTableWidget()
         layout.addWidget(self.tabela)
         self.tabela.setStyleSheet("background-color: lightblue; color: black")
-        self.tabela.setVisible(False)
         # Criar Botão para Alternar Visibilidade
         self.botao_toggle = QPushButton("Voltar")
         self.botao_toggle.clicked.connect(self.ocultar)
         self.botao_toggle.setStyleSheet("background-color: green; color: white;")
         self.botao_toggle.setFixedSize(80, 30)
         layout.addWidget(self.botao_toggle)
-        self.botao_toggle.setVisible(False)
         # self.tabela.setStyleSheet("QTableWidget { background-color: lightblue; color: black; }")  # Define a cor do texto para azul
-
+        self.ocultar()
 
     def carregar_dados(self):
-
-        vsql = "SELECT N_ID, T_NOME, T_CPF FROM tb_pessoa order by T_NOME"
+        vsql = "SELECT T_NOME, T_RG, T_CPF FROM tb_pessoa order by T_NOME"
         dados = banco.consultar(vsql)
-
         self.tabela.setRowCount(len(dados))
         self.tabela.setColumnCount(5)  # ID, Nome, Idade, Ações
-        self.tabela.setColumnWidth(0, 10)   # Coluna 0 com 50 pixels
-        self.tabela.setColumnWidth(1, 400)  # Coluna 1 com 150 pixels
+        self.tabela.setColumnWidth(0, 400)   # Coluna 0 com 50 pixels
+        self.tabela.setColumnWidth(1, 100)  # Coluna 1 com 150 pixels
         self.tabela.setColumnWidth(2, 100)  # Coluna 2 com 100 pixels
-        self.tabela.setHorizontalHeaderLabels(["ID", "Nome", "CPF", "Ações", ""])
-
+        self.tabela.setColumnWidth(3, 16)  # Coluna 2 com 100 pixels
+        self.tabela.setColumnWidth(4, 16)  # Coluna 2 com 100 pixels
+        self.tabela.setHorizontalHeaderLabels(["Nome", "RG", "CPF", "", ""])
         for linha_idx, linha in enumerate(dados):
             for col_idx, valor in enumerate(linha):
                 self.tabela.setItem(linha_idx, col_idx, QTableWidgetItem(str(valor)))
-
             # Botão Editar
-            botao_editar = QPushButton("Editar")
-            botao_editar.setStyleSheet("background-color: green; color white;")
-            botao_editar.clicked.connect(lambda _, row=linha[0]: self.editar_registro(row))
+            botao_editar = QPushButton("")
+            icone_editar = QIcon("edicao.png")  # Substitua com o caminho do seu ícone
+            botao_editar.setIcon(icone_editar)
+            botao_editar.setIconSize(QSize(32, 32))  # Tamanho do ícone
+            botao_editar.setStyleSheet("background-color: green; color black;")
+            botao_editar.clicked.connect(lambda _, row=linha[2]: self.editar_registro(row))
             self.tabela.setCellWidget(linha_idx, 3, botao_editar)
-
             # Botão Excluir
-            botao_excluir = QPushButton("Excluir")
+            botao_excluir = QPushButton("")
+            icone_excluir = QIcon("trash-can-red.jpg")  # Substitua com o caminho do seu ícone
+            botao_excluir.setIcon(icone_excluir)
+            botao_excluir.setIconSize(QSize(32, 32))  # Tamanho do ícone
             botao_excluir.setStyleSheet("background-color: red; color white;")
-            botao_excluir.clicked.connect(lambda _, row=linha[0]: self.excluir_registro(row))
+            botao_excluir.clicked.connect(lambda _, row=linha[2]: self.excluir_registro(row))
             self.tabela.setCellWidget(linha_idx, 4, botao_excluir)
 
-
-
     def editar_registro(self, id_registro):
-        """Simula edição de um registro"""
-        QMessageBox.information(self, "Editar", f"Editar formulário de {id_registro}")
+        # QMessageBox.information(self, "Editar", f"Editar formulário de {id_registro}")
+        vsql = "SELECT * FROM tb_pessoa WHERE T_CPF = "+ str(id_registro)
+        resultado = banco.consultar(vsql)
+        self.lenome.setText(resultado[0][1])
+        self.lerg.setText(resultado[0][2])
+        self.lecpf.setText(resultado[0][3])
+        self.lemae.setText(resultado[0][4])
+        self.lecpfmae.setText(resultado[0][5])
+        self.lepai.setText(resultado[0][6])
+        self.lecpfpai.setText(resultado[0][7])
+        self.inserir()
+        self.botao1.setVisible(False)
+        self.botao2.setVisible(False)
+        self.botao3 = QPushButton("Modificar", self.central_widget)
+        self.botao3.setFixedSize(80, 30)
+        self.botao3.move(400,400)
+        self.botao3.setStyleSheet('background-color:red;color:white')
+        self.botao3.setVisible(True)
+        self.botao3.clicked.connect(self.gravarDados)
+        sell.consultar()
+        self.botao3.setVisible(False)
 
     def excluir_registro(self, id_registro):
         """Exclui um registro do banco de dados"""
         resposta = QMessageBox.question(self, "Excluir", f"Tem certeza que deseja excluir o {id_registro}?",
                                         QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
         if resposta == QMessageBox.StandardButton.Yes:
-            vsql = "DELETE FROM tb_pessoa WHERE N_ID = "+ str(id_registro)
+            vsql = "DELETE FROM tb_pessoa WHERE T_CPF = "+ str(id_registro)
+            print(vsql)
             banco.atualizar(vsql)
             self.carregar_dados()  # Recarregar os dados após a exclusão
 
@@ -258,9 +258,7 @@ class MinhaJanela(QMainWindow):
         vcpfpai=self.lecpfpai.text()
         #vsql= "INSERT INTO tb_pessoa (T_NOME, [N_RG], [N_CPF], T_MAE, [N_CPF-MAE], T_PAI, [N_CPF-PAI]) VALUES('"+vnome+"',(vrg),(vcpf),'"+vmae+"',(vcpfmae),'"+vpai+"',(vcpfpai)"
         vsql="INSERT INTO tb_pessoa (T_NOME, T_RG, T_CPF, T_MAE, T_CPFMAE, T_PAI, T_CPFPAI) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s')" %(vnome, vrg, vcpf, vmae, vcpfmae, vpai, vcpfpai)
-        print(vsql)
         banco.atualizar(vsql)
-        print("Aqui.....")
         self.lenome.clear()
         self.lerg.clear()
         self.lecpf.clear()
@@ -280,13 +278,14 @@ class MinhaJanela(QMainWindow):
     def mostrar_mensagem_sobre(self):
         mensagem = QMessageBox(self)
         mensagem.setWindowTitle("Sobre")
-        mensagem.setStyleSheet('background: lightgray; color: black; font-size:18px;')
+        # mensagem.setStyleSheet('background: lightgray; color: black; font-size:18px;')
         mensagem.setText("""
 Controle de Formulários
 ONG Amazonia Viva
 Versão: 1.0.0
 Autor: Marcelo Ferreira
             """)
+        mensagem.setIcon(QMessageBox.Icon.Information)
         mensagem.setStandardButtons(QMessageBox.StandardButton.Ok)
         mensagem.exec()
 
