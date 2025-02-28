@@ -282,7 +282,10 @@ class MinhaJanela(QMainWindow):
         self.lecpfpai.clear()
 
     def modificarDados(self):
-        self.inserir_registro()
+        #vsql= "INSERT INTO tb_pessoa (T_NOME, [N_RG], [N_CPF], T_MAE, [N_CPF-MAE], T_PAI, [N_CPF-PAI]) VALUES('"+vnome+"',(vrg),(vcpf),'"+vmae+"',(vcpfmae),'"+vpai+"',(vcpfpai)"
+        vsql="UPDATE INTO tb_pessoa (T_NOME, T_RG, T_CPF, T_MAE, T_CPFMAE, T_PAI, T_CPFPAI) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s') WHERE N_ID =" %(vnome, vrg, vcpf, vmae, vcpfmae, vpai, vcpfpai)
+        banco.atualizar(vsql)
+
         self.consultar()
 
     def mostrar_mensagem_sobre(self):
