@@ -1,0 +1,59 @@
+1,Cidade de Deus
+1,Cidade Nova
+1,Colônia Santo Antônio
+1,Colônia Terra Nova
+1,Lago Azul
+1,Monte das Oliveiras
+1,Nova Cidade
+1,Novo Aleixo
+1,Novo Israel
+1,Santa Etelvina
+1,Águas Claras
+1,Alfredo Nascimento
+1,Aliança com Deus
+1,Amadeu Botelho
+1,Amazonino Mendes
+1,Américo Medeiros
+1,Boas Novas
+1,Carlos Braga
+1,Colônia Cachoeira Grande
+1,Colônia Japonesa
+1,Fazendinha
+1,Francisca Mendes
+1,Galileia
+1,Gustavo Nascimento
+1,Ismail Aziz
+1,Jardim Canaranas
+1,Jardim Independente
+1,Jardim Paulista
+1,Jesus me Deu
+1,José Bonifácio
+1,Manôa
+1,Monte Pascoal
+1,Monte Sinai
+1,Mundo Novo
+1,Nossa Senhora de Fátima
+1,Nossa Senhora do Perpétuo Socorro
+1,Núcleo 3
+1,Núcleo 4
+1,Núcleo 5
+1,Núcleo 7
+1,Núcleo 8
+1,Núcleo 9
+1,Núcleo 11
+1,Núcleo 12
+1,Núcleo 13
+1,Núcleo 15
+1,Núcleo 16
+1,Núcleo 21
+1,Núcleo 22
+1,Núcleo 23
+1,Núcleo 24
+1,Omar Aziz
+1,Parque das Garças
+1,Parque das Nações
+1,Parque dos Buritis
+1,Parque dos Ingleses
+1,Riacho Doce
+1,Vale do Sinai
+1,Vitória Régia

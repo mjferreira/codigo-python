@@ -1,0 +1,23 @@
+2,Betânia
+2,Cachoeirinha
+2,Centro
+2,Colônia Oliveira Machado
+2,Crespo
+2,Distrito Industrial I
+2,Educandos
+2,Japiim
+2,Morro da Liberdade
+2,Nossa Senhora de Aparecida
+2,Petrópolis
+2,Praça 14 de Janeiro
+2,Presidente Vargas
+2,Raiz
+2,Santa Luzia
+2,São Francisco
+2,São Lázaro
+2,Vila Buriti
+2,Ceasa
+2,Getúlio Vargas
+2,Lagoa Verde
+2,Morada do Sol
+2,Nova República

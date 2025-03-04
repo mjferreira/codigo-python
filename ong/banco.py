@@ -4,7 +4,6 @@ import os
 
 pastaApp=os.path.dirname(__file__)
 caminho=pastaApp+"/ong.db"
-print(caminho)
 ########## Criar Conexão
 def ConexaoBanco():
 #    caminho="/home/marcelo/programacao/codigo-python/ong/ong.db"
@@ -15,7 +14,7 @@ def ConexaoBanco():
         print(ex)
     return con
 
-def criarTabela(conexao,sql):
+def criarTabela(sql):
     vcon=ConexaoBanco()
     try:
         c=vcon.cursor()
@@ -44,7 +43,6 @@ def consultar(sql):
     vcon.close()
     return resultado
 
-
 #vsql= """INSERT INTO tb_pessoa1
 #          (T_NOME, [N_RG], [N_CPF], T_MAE, [N_CPF-MAE], T_PAI, [N_CPF-PAI])
 #           VALUES('teste',123456,12345678901,'Maria',123,'teste',123)
@@ -66,10 +64,9 @@ def consultar(sql):
 #            T_PAI       TEXT (60),
 #            T_CPFPAI   TEXT (11)
 #        );"""
-#vcon=ConexaoBanco()
-#criarTabela(vcon,vsql)
+
+#criarTabela(vsql)
 #vcon.close()
 
-# inserir(vcon,vsql)
-# deletar(vcon,vsql)
-# atualizar(vcon,vsql)
+# inserir(vsql)
+# atualizar(vsql)

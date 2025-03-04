@@ -1,0 +1,12 @@
+4,Compensa
+4,Glória
+4,Lírio do Vale
+4,Nova Esperança
+4,Ponta Negra
+4,Santo Agostinho
+4,Santo Antônio
+4,São Jorge
+4,São Raimundo
+4,Tarumã
+4,Tarumã-Açu
+4,Vila da Prata

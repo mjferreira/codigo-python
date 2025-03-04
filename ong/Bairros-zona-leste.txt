@@ -1,0 +1,29 @@
+3,Armando Mendes
+3,Colônia Antônio Aleixo
+3,Coroado
+3,Distrito Industrial II
+3,Gilberto Mestrinho
+3,Jorge Teixeira
+3,Mauazinho
+3,Puraquequara
+3,São José Operário
+3,Tancredo Neves
+3,Zumbi dos Palmares
+3,Acariquara
+3,Braga Mendes
+3,Castanheira
+3,Cidade do Leste
+3,Colina do Aleixo
+3,Grande Vitória
+3,João Bosco
+3,João Paulo
+3,Monte Sião
+3,Nova Conquista
+3,Nova Floresta
+3,Nova Vitória
+3,Novo Reino
+3,Ouro Verde
+3,Petro
+3,Santa Inês
+3,São Lucas
+3,Valparaíso

@@ -1,29 +1,49 @@
-from PyQt6.QtWidgets import QApplication, QWidget, QPushButton
-from PyQt6.QtGui import QIcon
-from PyQt6.QtCore import QSize
+from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QRadioButton, QLabel, QButtonGroup
 
-class MinhaJanela(QWidget):
+
+class JanelaPrincipal(QWidget):
     def __init__(self):
         super().__init__()
 
-        # Definir título da janela
-        self.setWindowTitle("Exemplo de Botão com Ícone")
+        self.setWindowTitle("Seleção com QRadioButton")
+        self.setGeometry(100, 100, 300, 200)
 
-        # Criar o botão e definir o ícone
-        botao_ok = QPushButton(self)
-        icone = QIcon("trash-can-red.jpg")  # Substitua com o caminho do seu ícone
-        botao_ok.setIcon(icone)
-        botao_ok.setIconSize(QSize(32, 32))  # Tamanho do ícone
-        botao_ok.setText("")  # Remove o texto para mostrar apenas o ícone
+        layout = QVBoxLayout()
 
-        # Exibir a janela
-        self.show()
+        self.label = QLabel("Escolha uma opção:")
 
-# Inicializar a aplicação
-app = QApplication([])
+        # Criar os botões de opção
+        self.radio1 = QRadioButton("Opção 1")
+        self.radio2 = QRadioButton("Opção 2")
+        self.radio3 = QRadioButton("Opção 3")
 
-# Criar e exibir a janela
-janela = MinhaJanela()
+        # Criar um grupo para os botões (garante que apenas um seja selecionado)
+        self.grupo = QButtonGroup(self)
+        self.grupo.addButton(self.radio1)
+        self.grupo.addButton(self.radio2)
+        self.grupo.addButton(self.radio3)
 
-# Iniciar o loop de eventos da aplicação
-app.exec()
+        # Conectar os botões para atualizar o rótulo
+        self.radio1.toggled.connect(self.atualizar_label)
+        self.radio2.toggled.connect(self.atualizar_label)
+        self.radio3.toggled.connect(self.atualizar_label)
+
+        # Adicionar widgets ao layout
+        layout.addWidget(self.label)
+        layout.addWidget(self.radio1)
+        layout.addWidget(self.radio2)
+        layout.addWidget(self.radio3)
+
+        self.setLayout(layout)
+
+    def atualizar_label(self):
+        # Verifica qual botão está selecionado e atualiza o rótulo
+        botao_selecionado = self.grupo.checkedButton()
+        if botao_selecionado:
+            self.label.setText(f"Selecionado: {botao_selecionado.text()}")
+
+if __name__ == "__main__":
+    app = QApplication([])
+    janela = JanelaPrincipal()
+    janela.show()
+    app.exec()

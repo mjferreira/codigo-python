@@ -1,0 +1,17 @@
+5,Adrianópolis
+5,Aleixo
+5,Chapada
+5,Flores
+5,Nossa Senhora das Graças
+5,Parque 10 de Novembro
+5,São Geraldo
+5,Bairro da União
+5,Eldorado
+5,Jardim Amazonas
+5,Jardim Primavera
+5,Jardim Sakura
+5,Parque das Laranjeiras
+5,Parque Shangri-lá
+5,Portal do Japão
+5,Vieiralves
+5,Vila Amazonas

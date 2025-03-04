@@ -1,4 +1,4 @@
-import sys
+import sys, re
 from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QVBoxLayout, QWidget, QPushButton, QLineEdit, QHBoxLayout, QMessageBox, QTableWidget
 from PyQt6.QtWidgets import QTableWidgetItem
 from PyQt6.QtGui import QAction, QIcon
@@ -85,11 +85,13 @@ class MinhaJanela(QMainWindow):
         self.lrg = QLabel("RG:", self.central_widget)
         self.lrg.move(10,40)
         self.lrg.setStyleSheet('color: black; font-size:16px;')
+
         self.lrg.setVisible(False)
 
         self.lerg = QLineEdit("", self.central_widget)
         self.lerg.setGeometry(80,40,120,25)
         self.lerg.setStyleSheet('background: white; color: black; font-size:18px;')
+        self.lerg.setInputMask("99999999999")
         self.lerg.setVisible(False)
 
         self.lcpf = QLabel("CPF:",self.central_widget)
@@ -98,6 +100,8 @@ class MinhaJanela(QMainWindow):
         self.lecpf = QLineEdit("",self.central_widget)
         self.lecpf.setStyleSheet('background: white; color: black; font-size:18px;')
         self.lecpf.setGeometry(80,70,150,25)
+        self.lecpf.setInputMask("999.999.999-99")  # Apenas números e "-" fixo
+
 
         # self.linhacpf = QLabel("________Dados Pessoais_____________________",self.central_widget)
         # self.linhacpf.move(10,90)
@@ -116,6 +120,8 @@ class MinhaJanela(QMainWindow):
         self.lecpfmae = QLineEdit("",self.central_widget)
         self.lecpfmae.setStyleSheet('background: white; color: black; font-size:18px;')
         self.lecpfmae.setGeometry(80,150,150,25)
+        self.lecpfmae.setInputMask("999.999.999-99")  # Apenas números e "-" fixo
+
 
         self.lpai = QLabel("Pai:",self.central_widget)
         self.lpai.move(10,180)
@@ -130,6 +136,7 @@ class MinhaJanela(QMainWindow):
         self.lecpfpai = QLineEdit("",self.central_widget)
         self.lecpfpai.setStyleSheet('background: white; color: black; font-size:18px;')
         self.lecpfpai.setGeometry(80,210,150,25)
+        self.lecpfpai.setInputMask("999.999.999-99")  # Apenas números e "-" fixo
 
 
         # Layout principal
@@ -147,16 +154,16 @@ class MinhaJanela(QMainWindow):
         self.ocultar_itens()
 
     def carregar_dados(self):
-        vsql = "SELECT N_ID, T_NOME, T_CPF FROM tb_pessoa order by T_NOME"
+        vsql = "SELECT T_NOME, T_CPF, T_RG FROM tb_pessoa order by T_NOME"
         dados = banco.consultar(vsql)
         self.tabela.setRowCount(len(dados))
         self.tabela.setColumnCount(5)  # ID, Nome, Idade, Ações
-        self.tabela.setColumnWidth(0, 50)   # Coluna 0 com 50 pixels
-        self.tabela.setColumnWidth(1, 400)  # Coluna 1 com 150 pixels
+        self.tabela.setColumnWidth(0, 510)   # Coluna 0 com 50 pixels
+        self.tabela.setColumnWidth(1, 100)  # Coluna 1 com 150 pixels
         self.tabela.setColumnWidth(2, 100)  # Coluna 2 com 100 pixels
         self.tabela.setColumnWidth(3, 16)  # Coluna 2 com 100 pixels
         self.tabela.setColumnWidth(4, 16)  # Coluna 2 com 100 pixels
-        self.tabela.setHorizontalHeaderLabels(["ID", "Nome", "CPF", "", ""])
+        self.tabela.setHorizontalHeaderLabels(["Nome", "CPF", "RG", "", ""])
         for linha_idx, linha in enumerate(dados):
             for col_idx, valor in enumerate(linha):
                 self.tabela.setItem(linha_idx, col_idx, QTableWidgetItem(str(valor)))
@@ -167,7 +174,7 @@ class MinhaJanela(QMainWindow):
             botao_editar.setIcon(icone_editar)
             botao_editar.setIconSize(QSize(32, 32))  # Tamanho do ícone
             # botao_editar.setStyleSheet("background-color: green; color black;")
-            botao_editar.clicked.connect(lambda _, row=linha[0]: self.editar_registro(row))
+            botao_editar.clicked.connect(lambda _, row=linha[1]: self.editar_registro(row))
             self.tabela.setCellWidget(linha_idx, 3, botao_editar)
             # Botão Excluir
             botao_excluir = QPushButton("")
@@ -175,40 +182,43 @@ class MinhaJanela(QMainWindow):
             botao_excluir.setIcon(icone_excluir)
             botao_excluir.setIconSize(QSize(32, 32))  # Tamanho do ícone
             #botao_excluir.setStyleSheet("background-color: red; color white;")
-            botao_excluir.clicked.connect(lambda _, row=linha[0]: self.excluir_registro(row))
+            botao_excluir.clicked.connect(lambda _, row=linha[1]: self.excluir_registro(row))
             self.tabela.setCellWidget(linha_idx, 4, botao_excluir)
 
-    def editar_registro(self, id_registro):
+    def editar_registro(self, cpf):
         # QMessageBox.information(self, "Editar", f"Editar formulário de {id_registro}")
-        vsql = "SELECT * FROM tb_pessoa WHERE N_ID = "+ str(id_registro)
+        vsql = "SELECT * FROM tb_pessoa WHERE T_CPF = "+ str(cpf)
         resultado = banco.consultar(vsql)
-        self.lenome.setText(resultado[0][1])
-        self.lerg.setText(resultado[0][2])
-        self.lecpf.setText(resultado[0][3])
-        self.lemae.setText(resultado[0][4])
-        self.lecpfmae.setText(resultado[0][5])
-        self.lepai.setText(resultado[0][6])
-        self.lecpfpai.setText(resultado[0][7])
+        self.lenome.setText(resultado[0][0])
+        self.lerg.setText(resultado[0][1])
+        self.lecpf.setText(resultado[0][2])
+        self.lemae.setText(resultado[0][3])
+        self.lecpfmae.setText(resultado[0][4])
+        self.lepai.setText(resultado[0][5])
+        self.lecpfpai.setText(resultado[0][6])
         self.modificar()
 
-    def excluir_registro(self, id_registro):
+    def excluir_registro(self, cpf):
         """Exclui um registro do banco de dados"""
-        resposta = QMessageBox.question(self, "Excluir", f"Tem certeza que deseja excluir o {id_registro}?",
+        resposta = QMessageBox.question(self, "Excluir", f"Tem certeza que deseja excluir o {cpf}?",
                                         QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
         if resposta == QMessageBox.StandardButton.Yes:
-            vsql = "DELETE FROM tb_pessoa WHERE N_ID = "+ str(id_registro)
-            print(vsql)
+            vsql = "DELETE FROM tb_pessoa WHERE T_CPF = "+ str(cpf)
             banco.atualizar(vsql)
             self.carregar_dados()  # Recarregar os dados após a exclusão
 
     def inserir(self):
         self.ocultar_itens()
         self.limpar_dados()
+        self.lecpf.setReadOnly(False)
+        self.lecpf.setStyleSheet('background: white; color: black; font-size:18px;')
         self.mostrar_formulario()
 
     def modificar(self):
         self.ocultar_itens()
         self.mostrar_formulario()
+        self.lecpf.setStyleSheet('background: lightgray; color: black; font-size:18px;')
+        self.lecpf.setReadOnly(True)
         self.botao1.setVisible(False)
         self.botao2.setVisible(False)
         self.botao3.setVisible(True)
@@ -262,15 +272,20 @@ class MinhaJanela(QMainWindow):
     def inserir_registro(self):
         vnome=self.lenome.text()
         vrg=self.lerg.text()
-        vcpf=self.lecpf.text()
+        vcpf=self.lecpf.text().replace("-", "").replace(".", "")
         vmae=self.lemae.text()
-        vcpfmae=self.lecpfmae.text()
+        vcpfmae=self.lecpfmae.text().replace("-", "").replace(".", "")
         vpai=self.lepai.text()
-        vcpfpai=self.lecpfpai.text()
-        #vsql= "INSERT INTO tb_pessoa (T_NOME, [N_RG], [N_CPF], T_MAE, [N_CPF-MAE], T_PAI, [N_CPF-PAI]) VALUES('"+vnome+"',(vrg),(vcpf),'"+vmae+"',(vcpfmae),'"+vpai+"',(vcpfpai)"
-        vsql="INSERT INTO tb_pessoa (T_NOME, T_RG, T_CPF, T_MAE, T_CPFMAE, T_PAI, T_CPFPAI) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s')" %(vnome, vrg, vcpf, vmae, vcpfmae, vpai, vcpfpai)
-        banco.atualizar(vsql)
-        self.limpar_dados()
+        vcpfpai=self.lecpfpai.text().replace("-", "").replace(".", "")
+
+        if self.cpf_existe(vcpf):
+            QMessageBox.critical(self, "Erro Crítico","CPF JÁ CADASTRADO !!!", QMessageBox.StandardButton.Ok)
+#        elif not self.cpf_valido(vcpf):
+#            QMessageBox.critical(self, "Erro Crítico","CPF INVÁLIDO !!!", QMessageBox.StandardButton.Ok)
+        else:
+            vsql="INSERT INTO tb_pessoa (T_NOME, T_RG, T_CPF, T_MAE, T_CPFMAE, T_PAI, T_CPFPAI) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s')" %(vnome, vrg, vcpf, vmae, vcpfmae, vpai, vcpfpai)
+            banco.atualizar(vsql)
+            self.limpar_dados()
 
     def limpar_dados(self):
         self.lenome.clear()
@@ -282,11 +297,69 @@ class MinhaJanela(QMainWindow):
         self.lecpfpai.clear()
 
     def modificarDados(self):
-        #vsql= "INSERT INTO tb_pessoa (T_NOME, [N_RG], [N_CPF], T_MAE, [N_CPF-MAE], T_PAI, [N_CPF-PAI]) VALUES('"+vnome+"',(vrg),(vcpf),'"+vmae+"',(vcpfmae),'"+vpai+"',(vcpfpai)"
-        vsql="UPDATE INTO tb_pessoa (T_NOME, T_RG, T_CPF, T_MAE, T_CPFMAE, T_PAI, T_CPFPAI) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s') WHERE N_ID =" %(vnome, vrg, vcpf, vmae, vcpfmae, vpai, vcpfpai)
+        vnome=self.lenome.text()
+        vrg=self.lerg.text()
+        vcpf=self.lecpf.text().replace("-", "").replace(".", "")
+        vmae=self.lemae.text()
+        vcpfmae=self.lecpfmae.text().replace("-", "").replace(".", "")
+        vpai=self.lepai.text()
+        vcpfpai=self.lecpfpai.text().replace("-", "").replace(".", "")
+        vsql= "UPDATE tb_pessoa SET T_NOME='"+vnome+"',T_RG='"+vrg+"',T_CPF='"+vcpf+"',T_MAE='"+vmae+"',T_CPFMAE='"+vcpfmae+"',T_PAI='"+vpai+"',T_CPFPAI='"+vcpfpai+"' WHERE T_CPF="+vcpf
         banco.atualizar(vsql)
-
         self.consultar()
+
+
+    def cpf_valido(self, cpf: str) -> bool:
+        """Valida um número de CPF (Cadastro de Pessoa Física) do Brasil."""
+
+        # Remover caracteres não numéricos
+        cpf = re.sub(r"\D", "", cpf)
+
+        # Verificar se tem exatamente 11 dígitos
+        if len(cpf) != 11:
+            return False
+
+        # Verificar se todos os dígitos são iguais (ex: "111.111.111-11")
+        if cpf == cpf[0] * 11:
+            return False
+
+        # Função para calcular o dígito verificador
+        def calcular_digito(cpf_parcial, peso_inicial):
+            soma = sum(int(digito) * peso for digito, peso in zip(cpf_parcial, range(peso_inicial, 1, -1)))
+            resto = soma % 11
+            return "0" if resto < 2 else str(11 - resto)
+
+        # Validar o primeiro dígito verificador
+        primeiro_digito = calcular_digito(cpf[:9], 10)
+        if cpf[9] != primeiro_digito:
+            return False
+
+        # Validar o segundo dígito verificador
+        segundo_digito = calcular_digito(cpf[:10], 11)
+        if cpf[10] != segundo_digito:
+            return False
+
+        return True
+
+    def mostrar_mensagem(self, texto):
+        mensagem = QMessageBox.critical(self)
+        mensagem.setWindowTitle("Erro")
+        # mensagem.setStyleSheet('background: lightgray; color: black; font-size:18px;')
+        mensagem.setText(texto)
+        mensagem.setIcon(QMessageBox.Icon.Information)
+        mensagem.setStandardButtons(QMessageBox.StandardButton.Ok)
+        mensagem.exec()
+
+    def cpf_existe(self, cpf):
+        """Verifica se o CPF já existe no banco de dados."""
+        vsql = "SELECT T_CPF FROM tb_pessoa WHERE T_CPF = "+ str(cpf)
+        print(vsql)
+        resultado = banco.consultar(vsql)
+        print(resultado)
+        if len(resultado) == 0:
+            return False
+        else:
+            return True
 
     def mostrar_mensagem_sobre(self):
         mensagem = QMessageBox(self)

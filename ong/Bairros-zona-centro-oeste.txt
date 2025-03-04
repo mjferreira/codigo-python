@@ -1,0 +1,14 @@
+6,Alvorada
+6,Bairro da Paz
+6,Dom Pedro
+6,Planalto
+6,Redenção
+6,Ajuricaba
+6,Campos Elíseos
+6,Déborah
+6,Hileia
+6,Jardim Versailles
+6,Kíssia
+6,Parque Riachuelo
+6,Promorar
+6,São Pedro
