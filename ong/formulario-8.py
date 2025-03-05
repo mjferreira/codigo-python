@@ -260,7 +260,7 @@ class MinhaJanela(QMainWindow):
         linha=linha+30
         self.loutrobeneficio = QLabel("OUTROS:",self.central_widget)
         self.loutrobeneficio.move(10,linha)
-        self.loutrobeneficio.setStyleSheet('color: black; font-size:16px')
+        self.loutrobeneficio.setStyleSheet('color: red; font-size:16px')
         self.leoutrobeneficio = QLineEdit("", self.central_widget)
         self.leoutrobeneficio.setGeometry(100,linha,200,25)
         self.leoutrobeneficio.setStyleSheet('background: white; color: black; font-size:18px;')
@@ -270,7 +270,6 @@ class MinhaJanela(QMainWindow):
         self.linhainfpes.move(80,linha)
         self.linhainfpes.setStyleSheet('color: blue; font-size:14px')
         self.linhainfpes.adjustSize()
-
 
         # Layout principale
         layout = QVBoxLayout(self.central_widget)
@@ -337,6 +336,24 @@ class MinhaJanela(QMainWindow):
         self.combo_grau.setCurrentText(resultado[0][11])
         self.leescola.setText(resultado[0][12])
         self.combo_escola_ano.setCurrentText(resultado[0][13])
+        self.combo_trabalha.setCurrentText(resultado[0][14])
+        self.lerenda.setText(resultado[0][15])
+        self.combo_recbeneficio.setCurrentText(resultado[0][16])
+        nomebeneficio=resultado[0][17]
+        print(nomebeneficio)
+        if nomebeneficio is not None:
+            print("Nao nulo")
+            if nomebeneficio in ["BPC","Bolsa Família", "Aponsentadoria"]:
+                self.combo_nomebeneficio.setCurrentText(nomebeneficio)
+                self.combo_nomebeneficio.setVisible(True)
+                self.lnomebenefinicio.setVisible(True)
+                print("Na lista")
+            else:
+                self.combo_nomebeneficio.setCurrentText("Outros")
+                self.leoutrobeneficio.setText(nomebeneficio)
+                self.loutrobeneficio.setVisible(True)
+                self.leoutrobeneficio.setVisible(True)
+                print("outro")
 
         if id_bairro == None:
             self.combo_zona.setCurrentIndex(-1)
@@ -366,7 +383,7 @@ class MinhaJanela(QMainWindow):
         self.lecpf.setStyleSheet('background: white; color: black; font-size:18px;')
         self.mostrar_formulario()
     def modificar(self):
-        self.ocultar_itens()
+        self.ocultar_itens_consulta()
         self.mostrar_formulario()
         self.lecpf.setStyleSheet('background: lightgray; color: black; font-size:18px;')
         self.lecpf.setReadOnly(True)
@@ -422,6 +439,9 @@ class MinhaJanela(QMainWindow):
         self.carregar_tabela_consulta()
         self.tabela.setVisible(True)
         self.botao_toggle.setVisible(True)
+    def ocultar_itens_consulta(self):
+        self.botao_toggle.setVisible(False)
+        self.tabela.setVisible(False)
     def ocultar_itens(self):
         self.botao_toggle.setVisible(False)
         self.linhaiden.setVisible(False)
@@ -523,8 +543,10 @@ class MinhaJanela(QMainWindow):
             QMessageBox.critical(self, "Erro Crítico","CPF JÁ CADASTRADO !!!", QMessageBox.StandardButton.Ok)
         elif len(vbairro) == 0:
             QMessageBox.critical(self, "Erro Crítico","Selecione o endereço !!!", QMessageBox.StandardButton.Ok)
-        elif len(vbairro) == 0:
+        elif not self.cpf_valido(vnis):
             QMessageBox.critical(self, "Erro Crítico","NIS INVÁLIDO !!!", QMessageBox.StandardButton.Ok)
+        elif self.combo_nomebeneficio.currentText() == "Outros" and len(vnomebeneficio) == 0:
+            QMessageBox.critical(self, "Erro Crítico","Nome de Benefício deve ser definido !!!", QMessageBox.StandardButton.Ok)
         else:
             vsql="INSERT INTO tb_pessoa (T_NOME, T_RG, T_CPF, T_MAE, T_CPFMAE, T_PAI, T_CPFPAI, N_BAIRRO, T_NIS, T_FONE, T_CEP, T_GRAU_ENSINO, T_ESCOLA, T_SERIE_ANO, T_TRABALHA, T_RENDA, T_RECBENEFICIO, T_NOMEBENEFICIO) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')" %(vnome, vrg, vcpf, vmae, vcpfmae, vpai, vcpfpai, vbairro[0], vnis, vfone, vcep, vgrau_ensino, vescola, vserieano, vtrabalha, vrenda, vrecbeneficio, vnomebeneficio)
             print(vsql)
@@ -566,20 +588,28 @@ class MinhaJanela(QMainWindow):
         vgrau_ensino=self.combo_grau.currentText()
         vescola=self.leescola.text()
         vserieano=self.combo_escola_ano.currentText()
+        vtrabalha=self.combo_trabalha.currentText()
+        vrenda=self.lerenda.text().replace(".", "").replace(",", "")
+        vrecbeneficio=self.combo_recbeneficio.currentText()
+        if self.combo_nomebeneficio.currentText() == "Outros":
+            vnomebeneficio=self.leoutrobeneficio.text()
+        else:
+            vnomebeneficio=self.combo_nomebeneficio.currentText()
         vsql="SELECT N_ID FROM tb_bairro WHERE T_BAIRRO = "+ '"' + vbairro + '"'
         vbairro=[row[0] for row in banco.consultar(vsql)]
         if not self.cpf_valido(vcpf):
             QMessageBox.critical(self, "Erro Crítico","CPF INVÁLIDO !!!", QMessageBox.StandardButton.Ok)
         elif len(vbairro) == 0:
             QMessageBox.critical(self, "Erro Crítico","Selecione o endereço !!!", QMessageBox.StandardButton.Ok)
-        elif len(vbairro) == 0:
+        elif not self.cpf_valido(vnis):
             QMessageBox.critical(self, "Erro Crítico","NIS INVÁLIDO !!!", QMessageBox.StandardButton.Ok)
+        elif self.combo_nomebeneficio.currentText() == "Outros" and len(vnomebeneficio) == 0:
+            QMessageBox.critical(self, "Erro Crítico","Nome de Benefício deve ser definido !!!", QMessageBox.StandardButton.Ok)
         else:
-            vsql= "UPDATE tb_pessoa SET T_NOME='"+vnome+"',T_RG='"+vrg+"',T_CPF='"+vcpf+"',T_MAE='"+vmae+"',T_CPFMAE='"+vcpfmae+"',T_PAI='"+vpai+"',T_CPFPAI='"+vcpfpai+"',N_BAIRRO="+str(vbairro[0])+",T_NIS='"+vnis+"',T_FONE='"+vfone+"',T_CEP='"+vcep+"',T_GRAU_ENSINO='"+vgrau_ensino+"',T_ESCOLA='"+vescola+"',T_SERIE_ANO='"+vserieano+"' WHERE T_CPF="+vcpf
+            vsql= "UPDATE tb_pessoa SET T_NOME='"+vnome+"',T_RG='"+vrg+"',T_CPF='"+vcpf+"',T_MAE='"+vmae+"',T_CPFMAE='"+vcpfmae+"',T_PAI='"+vpai+"',T_CPFPAI='"+vcpfpai+"',N_BAIRRO="+str(vbairro[0])+",T_NIS='"+vnis+"',T_FONE='"+vfone+"',T_CEP='"+vcep+"',T_GRAU_ENSINO='"+vgrau_ensino+"',T_ESCOLA='"+vescola+"',T_SERIE_ANO='"+vserieano+"',T_TRABALHA='"+vtrabalha+"',T_RENDA='"+vrenda+"',T_RECBENEFICIO='"+vrecbeneficio+"',T_NOMEBENEFICIO='"+vnomebeneficio+"' WHERE T_CPF="+vcpf
             print(vsql)
             banco.atualizar(vsql)
-
-        self.consultar()
+            self.consultar()
     def cpf_valido(self, cpf: str) -> bool:
         """Valida um número de CPF (Cadastro de Pessoa Física) do Brasil."""
 
