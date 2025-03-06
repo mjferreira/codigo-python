@@ -297,6 +297,18 @@ class MinhaJanela(QMainWindow):
         self.linhacompo.setStyleSheet('color: blue; font-size:14px')
         self.linhacompo.adjustSize()
 
+
+
+        # Criando a tabela
+        self.table = QTableWidget(3, 3, self.central_widget)  # Inicia com 0 linhas e 3 colunas
+        self.table.setHorizontalHeaderLabels(["Nome", "Parentesco", "Local"])
+        self.table.setColumnWidth(0, 150)
+        self.table.setColumnWidth(1, 120)
+        self.table.setColumnWidth(2, 150)
+        self.table.setGeometry(10,linha,600,300)
+
+
+
         # Layout principale
         layout = QVBoxLayout(self.central_widget)
         # Campo de busca
