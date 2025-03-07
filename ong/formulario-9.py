@@ -9,7 +9,7 @@ class MinhaJanela(QMainWindow):
     def __init__(self):
         super().__init__()
         # self.resize(600,500)
-        self.setGeometry(500, 200, 850, 800)
+        self.setGeometry(500, 200, 750, 1000)
         self.setWindowTitle("Ong Amazonia Vivia")
         self.setStyleSheet("background-color: lightblue; color: black;")
 
@@ -297,17 +297,23 @@ class MinhaJanela(QMainWindow):
         self.linhacompo.setStyleSheet('color: blue; font-size:14px')
         self.linhacompo.adjustSize()
 
-
-
+        linha=linha+30
         # Criando a tabela
-        self.table = QTableWidget(3, 3, self.central_widget)  # Inicia com 0 linhas e 3 colunas
-        self.table.setHorizontalHeaderLabels(["Nome", "Parentesco", "Local"])
-        self.table.setColumnWidth(0, 150)
-        self.table.setColumnWidth(1, 120)
-        self.table.setColumnWidth(2, 150)
-        self.table.setGeometry(10,linha,600,300)
+        self.tabela_composicao = QTableWidget(0, 3, self.central_widget)  # Inicia com 0 linhas e 3 colunas
+        self.tabela_composicao.setHorizontalHeaderLabels(["Nome", "Parentesco", "Escola/Local de Trabalho"])
+        self.tabela_composicao.setColumnWidth(0, 200)
+        self.tabela_composicao.setColumnWidth(1, 100)
+        self.tabela_composicao.setColumnWidth(2, 395)
+        self.tabela_composicao.setGeometry(10,linha,700,100)
 
+        linha=linha+100
+        self.botao_add = QPushButton("Adicionar", self.central_widget)
+        self.botao_add.clicked.connect(self.adiciona_composicao)
+        self.botao_add.setGeometry(10,linha,300,30)
 
+        self.botao_remove = QPushButton("Remover", self.central_widget)
+        self.botao_remove.clicked.connect(self.remove_composicao)
+        self.botao_remove.setGeometry(410,linha,300,30)
 
         # Layout principale
         layout = QVBoxLayout(self.central_widget)
@@ -360,7 +366,6 @@ class MinhaJanela(QMainWindow):
             #botao_excluir.setStyleSheet("background-color: red; color white;")
             botao_excluir.clicked.connect(lambda _, row=linha[1]: self.excluir_registro(row))
             self.tabela.setCellWidget(linha_idx, 4, botao_excluir)
-
     def editar_registro(self, cpf):
         # QMessageBox.information(self, "Editar", f"Editar formulário de {id_registro}")
         vsql = "SELECT * FROM tb_pessoa WHERE T_CPF = "+ str(cpf)
@@ -489,6 +494,9 @@ class MinhaJanela(QMainWindow):
         self.lmedicacao.setVisible(True)
         self.combo_medicacao.setVisible(True)
         self.linhacompo.setVisible(True)
+        self.tabela_composicao.setVisible(True)
+        self.botao_add.setVisible(True)
+        self.botao_remove.setVisible(True)
     def consultar(self):
         self.carregar_tabela_consulta()
         self.tabela.setVisible(True)
@@ -557,6 +565,9 @@ class MinhaJanela(QMainWindow):
         self.lnomemedicacao.setVisible(False)
         self.lenomemedicacao.setVisible(False)
         self.linhacompo.setVisible(False)
+        self.tabela_composicao.setVisible(False)
+        self.botao_add.setVisible(False)
+        self.botao_remove.setVisible(False)
     def carregar_dados(self):
                 vnome=self.lenome.text()
                 vrg=self.lerg.text()
@@ -615,6 +626,7 @@ class MinhaJanela(QMainWindow):
             vsql="INSERT INTO tb_pessoa (T_NOME, T_RG, T_CPF, T_MAE, T_CPFMAE, T_PAI, T_CPFPAI, N_BAIRRO, T_NIS, T_FONE, T_CEP, T_GRAU_ENSINO, T_ESCOLA, T_SERIE_ANO, T_TRABALHA, T_RENDA, T_RECBENEFICIO, T_NOMEBENEFICIO, T_MEDICACAO, T_NOMEMEDICACAO) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')" %(vnome, vrg, vcpf, vmae, vcpfmae, vpai, vcpfpai, vbairro[0], vnis, vfone, vcep, vgrau_ensino, vescola, vserieano, vtrabalha, vrenda, vrecbeneficio, vnomebeneficio, vmedicacao, vnomemedicacao)
             print(vsql)
             banco.atualizar(vsql)
+            self.gravar_composicao()
             self.limpar_dados()
     def limpar_dados(self):
         self.combo_zona.setCurrentIndex(-1)
@@ -791,6 +803,23 @@ class MinhaJanela(QMainWindow):
                     row_visible = True
                     break  # Se um dos campos da linha corresponde, mantemos a linha visível
             self.tabela.setRowHidden(row, not row_visible)
+    def adiciona_composicao(self, nome="", parentesco="Esposo(a)", local=""):
+        """Adiciona uma nova linha com valores opcionais"""
+        row_position = self.tabela_composicao.rowCount()
+        self.tabela_composicao.insertRow(row_position)
+
+        self.tabela_composicao.setItem(row_position, 0, QTableWidgetItem(nome))
+        self.tabela_composicao.setItem(row_position, 2, QTableWidgetItem(local))
+
+        combo = QComboBox()
+        combo.addItems(["Esposo(a)","Pai", "Mãe", "Filho(a)", "Avô(ó)","Sobrinho(a)","Enteado(a)","Tio(a)"])
+        combo.setCurrentText(parentesco)
+        self.tabela_composicao.setCellWidget(row_position, 1, combo)
+    def remove_composicao(self):
+        """Remove a linha selecionada"""
+        selected = self.tabela_composicao.currentRow()
+        if selected >= 0:
+            self.tabela_composicao.removeRow(selected)
     def mostrar_mensagem_sobre(self):
         mensagem = QMessageBox(self)
         mensagem.setWindowTitle("Sobre")
@@ -804,6 +833,24 @@ Autor: Marcelo Ferreira
         mensagem.setIcon(QMessageBox.Icon.Information)
         mensagem.setStandardButtons(QMessageBox.StandardButton.Ok)
         mensagem.exec()
+    def gravar_composicao(self):
+        """Salva os dados da tabela no banco de dados"""
+        # Limpa os dados antes de salvar para evitar duplicação
+        vcpf=self.lecpf.text().replace("-", "").replace(".", "")
+        vsql="DELETE FROM tb_composicao WHERE T_CPF = "+"'"+vcpf+"'"
+        print(vsql)
+        banco.atualizar(vsql)
+
+        for row in range(self.tabela_composicao.rowCount()):
+            vnome = self.tabela_composicao.item(row, 0).text() if self.tabela_composicao.item(row, 0) else ""
+            vlocal = self.tabela_composicao.item(row, 2).text() if self.tabela_composicao.item(row, 2) else ""
+            vparentesco_widget = self.tabela_composicao.cellWidget(row, 1)  # Obtém o QComboBox
+            vparentesco = vparentesco_widget.currentText() if vparentesco_widget else ""
+            vsql="INSERT INTO tb_composicao (T_CPF, T_NOME, T_PARENTESCO, T_ESCOLA_TRABALHO) VALUES ("+"'"+vcpf+"'"+","+"'"+vnome+"'"+","+"'"+vparentesco+"'"+","+"'"+vlocal+"'"+")"
+            print(vsql)
+            banco.atualizar(vsql)
+
+        print("Dados salvos com sucesso!")
 
 app = QApplication(sys.argv)
 janela = MinhaJanela()
