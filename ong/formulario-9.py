@@ -44,25 +44,25 @@ class MinhaJanela(QMainWindow):
         menu_sobre.addAction(acao_mostrar)
         self.botao1 = QPushButton("Gravar", self.central_widget)
         self.botao1.setFixedSize(80, 30)
-        self.botao1.move(750,700)
+        self.botao1.move(650,700)
         self.botao1.setStyleSheet('background-color:red;color:white')
         self.botao1.clicked.connect(self.inserir_registro)
 
         self.botao2 = QPushButton("Voltar", self.central_widget)
         self.botao2.setFixedSize(80,30)
-        self.botao2.move(600,700)
+        self.botao2.move(500,700)
         self.botao2.setStyleSheet('background-color:green;color:white')
         self.botao2.clicked.connect(self.ocultar_itens)
 
         self.botao3 = QPushButton("Atualizar", self.central_widget)
         self.botao3.setFixedSize(80, 30)
-        self.botao3.move(750,700)
+        self.botao3.move(650,700)
         self.botao3.setStyleSheet('background-color:red;color:white')
         self.botao3.clicked.connect(self.atualizar_dados)
 
         self.botao4 = QPushButton("Voltar Consulta", self.central_widget)
         self.botao4.setFixedSize(120,30)
-        self.botao4.move(600,700)
+        self.botao4.move(500,700)
         self.botao4.setStyleSheet('background-color:green;color:white')
         self.botao4.clicked.connect(self.consultar)
 
@@ -336,16 +336,16 @@ class MinhaJanela(QMainWindow):
         self.ocultar_itens()
 
     def carregar_tabela_consulta(self):
-        vsql = "SELECT T_NOME, T_CPF, T_RG FROM tb_pessoa order by T_NOME"
+        vsql = "SELECT T_NOME, T_CPF, T_NIS FROM tb_pessoa order by T_NOME"
         dados = banco.consultar(vsql)
         self.tabela.setRowCount(len(dados))
         self.tabela.setColumnCount(5)  # ID, Nome, Idade, Ações
-        self.tabela.setColumnWidth(0, 510)   # Coluna 0 com 50 pixels
-        self.tabela.setColumnWidth(1, 100)  # Coluna 1 com 150 pixels
-        self.tabela.setColumnWidth(2, 100)  # Coluna 2 com 100 pixels
+        self.tabela.setColumnWidth(0, 440)   # Coluna 0 com 50 pixels
+        self.tabela.setColumnWidth(1, 105)  # Coluna 1 com 150 pixels
+        self.tabela.setColumnWidth(2, 105)  # Coluna 2 com 100 pixels
         self.tabela.setColumnWidth(3, 16)  # Coluna 2 com 100 pixels
         self.tabela.setColumnWidth(4, 16)  # Coluna 2 com 100 pixels
-        self.tabela.setHorizontalHeaderLabels(["Nome", "CPF", "RG", "", ""])
+        self.tabela.setHorizontalHeaderLabels(["Nome", "CPF", "NIS", "", ""])
         for linha_idx, linha in enumerate(dados):
             for col_idx, valor in enumerate(linha):
                 self.tabela.setItem(linha_idx, col_idx, QTableWidgetItem(str(valor)))
@@ -393,6 +393,9 @@ class MinhaJanela(QMainWindow):
         medicacao=resultado[0][18]
         self.lenomemedicacao.setText(resultado[0][19])
         self.combo_medicacao.setCurrentText(medicacao)
+        print("--------------")
+        print(self.combo_recbeneficio.currentText())
+        print(nomebeneficio)
         if len(nomebeneficio) != 0:
             if nomebeneficio in ["BPC","Bolsa Família", "Aponsentadoria"]:
                 self.combo_nomebeneficio.setCurrentText(nomebeneficio)
@@ -422,7 +425,8 @@ class MinhaJanela(QMainWindow):
             vzona=[row[0] for row in banco.consultar(vsql)]
             self.combo_zona.setCurrentText(vzona[0])
             self.combo_bairro.setCurrentText(vbairro[0])
-
+        self.tabela_composicao.setRowCount(0)
+        self.carregar_composicao()
         self.modificar()
     def excluir_registro(self, cpf):
         """Exclui um registro do banco de dados"""
@@ -498,6 +502,7 @@ class MinhaJanela(QMainWindow):
         self.botao_add.setVisible(True)
         self.botao_remove.setVisible(True)
     def consultar(self):
+        self.ocultar_itens()
         self.carregar_tabela_consulta()
         self.tabela.setVisible(True)
         self.botao_toggle.setVisible(True)
@@ -603,10 +608,13 @@ class MinhaJanela(QMainWindow):
         vtrabalha=self.combo_trabalha.currentText()
         vrenda=self.lerenda.text().replace(".", "").replace(",", "")
         vrecbeneficio=self.combo_recbeneficio.currentText()
-        if self.combo_nomebeneficio.currentText() == "Outros":
-            vnomebeneficio=self.leoutrobeneficio.text()
+        if vrecbeneficio == "SIM":
+            if self.combo_nomebeneficio.currentText() == "Outros":
+                vnomebeneficio=self.leoutrobeneficio.text()
+            else:
+                vnomebeneficio=self.combo_nomebeneficio.currentText()
         else:
-            vnomebeneficio=self.combo_nomebeneficio.currentText()
+            vnomebeneficio=""
         vmedicacao=self.combo_medicacao.currentText()
         vnomemedicacao=self.lenomemedicacao.text()
         vsql="SELECT N_ID FROM tb_bairro WHERE T_BAIRRO = "+ '"' + vbairro + '"'
@@ -620,6 +628,8 @@ class MinhaJanela(QMainWindow):
             QMessageBox.critical(self, "Erro Crítico","Selecione o endereço !!!", QMessageBox.StandardButton.Ok)
         elif not self.cpf_valido(vnis):
             QMessageBox.critical(self, "Erro Crítico","NIS INVÁLIDO !!!", QMessageBox.StandardButton.Ok)
+        elif self.combo_recbeneficio.currentText() == "SIM" and self.combo_nomebeneficio.currentText() == "Outros" and len(vnomebeneficio) == 0:
+            QMessageBox.critical(self, "Erro Crítico","Nome de Benefício deve ser definido !!!", QMessageBox.StandardButton.Ok)
         elif self.combo_medicacao.currentText() == "SIM" and len(vnomemedicacao) == 0:
             QMessageBox.critical(self, "Erro Crítico","Nome da Medicação deve ser informada !!!", QMessageBox.StandardButton.Ok)
         else:
@@ -651,6 +661,7 @@ class MinhaJanela(QMainWindow):
         self.combo_nomebeneficio.setCurrentIndex(-1)
         self.combo_medicacao.setCurrentIndex(1)
         self.lenomemedicacao.clear()
+        self.tabela_composicao.setRowCount(0)
     def atualizar_dados(self):
         vnome=self.lenome.text()
         vrg=self.lerg.text()
@@ -669,16 +680,15 @@ class MinhaJanela(QMainWindow):
         vtrabalha=self.combo_trabalha.currentText()
         vrenda=self.lerenda.text().replace(".", "").replace(",", "")
         vrecbeneficio=self.combo_recbeneficio.currentText()
-        if self.combo_nomebeneficio.currentText() == "Outros":
-            vnomebeneficio=self.leoutrobeneficio.text()
+        if vrecbeneficio == "SIM":
+            if self.combo_nomebeneficio.currentText() == "Outros":
+                vnomebeneficio=self.leoutrobeneficio.text()
+            else:
+                vnomebeneficio=self.combo_nomebeneficio.currentText()
         else:
-            vnomebeneficio=self.combo_nomebeneficio.currentText()
+            vnomebeneficio=""
         vmedicacao=self.combo_medicacao.currentText()
         vnomemedicacao=self.lenomemedicacao.text()
-        print(vrecbeneficio)
-        print(vnomebeneficio)
-        print(vmedicacao)
-        print(vnomemedicacao)
         vsql="SELECT N_ID FROM tb_bairro WHERE T_BAIRRO = "+ '"' + vbairro + '"'
         vbairro=[row[0] for row in banco.consultar(vsql)]
         if not self.cpf_valido(vcpf):
@@ -687,7 +697,7 @@ class MinhaJanela(QMainWindow):
             QMessageBox.critical(self, "Erro Crítico","Selecione o endereço !!!", QMessageBox.StandardButton.Ok)
         elif not self.cpf_valido(vnis):
             QMessageBox.critical(self, "Erro Crítico","NIS INVÁLIDO !!!", QMessageBox.StandardButton.Ok)
-        elif self.combo_nomebeneficio.currentText() == "Outros" and len(vnomebeneficio) == 0:
+        elif self.combo_recbeneficio.currentText() == "SIM" and self.combo_nomebeneficio.currentText() == "Outros" and len(vnomebeneficio) == 0:
             QMessageBox.critical(self, "Erro Crítico","Nome de Benefício deve ser definido !!!", QMessageBox.StandardButton.Ok)
         elif self.combo_medicacao.currentText() == "SIM" and len(vnomemedicacao) == 0:
             QMessageBox.critical(self, "Erro Crítico","Nome da Medicação deve ser informada !!!", QMessageBox.StandardButton.Ok)
@@ -695,6 +705,7 @@ class MinhaJanela(QMainWindow):
             vsql= "UPDATE tb_pessoa SET T_NOME='"+vnome+"',T_RG='"+vrg+"',T_CPF='"+vcpf+"',T_MAE='"+vmae+"',T_CPFMAE='"+vcpfmae+"',T_PAI='"+vpai+"',T_CPFPAI='"+vcpfpai+"',N_BAIRRO="+str(vbairro[0])+",T_NIS='"+vnis+"',T_FONE='"+vfone+"',T_CEP='"+vcep+"',T_GRAU_ENSINO='"+vgrau_ensino+"',T_ESCOLA='"+vescola+"',T_SERIE_ANO='"+vserieano+"',T_TRABALHA='"+vtrabalha+"',T_RENDA='"+vrenda+"',T_RECBENEFICIO='"+vrecbeneficio+"',T_NOMEBENEFICIO='"+vnomebeneficio+"',T_MEDICACAO='"+vmedicacao+"',T_NOMEMEDICACAO='"+vnomemedicacao+"' WHERE T_CPF="+vcpf
             print(vsql)
             banco.atualizar(vsql)
+            self.gravar_composicao()
             self.consultar()
     def cpf_valido(self, cpf: str) -> bool:
         """Valida um número de CPF (Cadastro de Pessoa Física) do Brasil."""
@@ -806,8 +817,8 @@ class MinhaJanela(QMainWindow):
     def adiciona_composicao(self, nome="", parentesco="Esposo(a)", local=""):
         """Adiciona uma nova linha com valores opcionais"""
         row_position = self.tabela_composicao.rowCount()
+        print("row_position = %s", row_position)
         self.tabela_composicao.insertRow(row_position)
-
         self.tabela_composicao.setItem(row_position, 0, QTableWidgetItem(nome))
         self.tabela_composicao.setItem(row_position, 2, QTableWidgetItem(local))
 
@@ -840,7 +851,6 @@ Autor: Marcelo Ferreira
         vsql="DELETE FROM tb_composicao WHERE T_CPF = "+"'"+vcpf+"'"
         print(vsql)
         banco.atualizar(vsql)
-
         for row in range(self.tabela_composicao.rowCount()):
             vnome = self.tabela_composicao.item(row, 0).text() if self.tabela_composicao.item(row, 0) else ""
             vlocal = self.tabela_composicao.item(row, 2).text() if self.tabela_composicao.item(row, 2) else ""
@@ -849,9 +859,17 @@ Autor: Marcelo Ferreira
             vsql="INSERT INTO tb_composicao (T_CPF, T_NOME, T_PARENTESCO, T_ESCOLA_TRABALHO) VALUES ("+"'"+vcpf+"'"+","+"'"+vnome+"'"+","+"'"+vparentesco+"'"+","+"'"+vlocal+"'"+")"
             print(vsql)
             banco.atualizar(vsql)
+    def carregar_composicao(self):
+        """Carrega os dados do banco de dados para a tabela"""
+        vcpf=self.lecpf.text().replace("-", "").replace(".", "")
+        vsql="SELECT T_NOME, T_PARENTESCO, T_ESCOLA_TRABALHO  FROM tb_composicao WHERE T_CPF ="+str(vcpf)
+        print(vsql)
+        rows = banco.consultar(vsql)
+        print(rows)
 
-        print("Dados salvos com sucesso!")
-
+        # Adiciona os dados à tabela
+        for row in rows:
+            self.adiciona_composicao(row[0], row[1], row[2])
 app = QApplication(sys.argv)
 janela = MinhaJanela()
 janela.show()
