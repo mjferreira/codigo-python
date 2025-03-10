@@ -82,14 +82,11 @@ class TableWindow(QDialog):
             combo.setCurrentText(parentesco)
             self.tabela_composicao.setCellWidget(row_count, 1, combo)
 
-
-
-
 class MinhaJanela(QMainWindow):
     def __init__(self):
         super().__init__()
         # self.resize(600,500)
-        self.setGeometry(500, 200, 750, 1000)
+        self.setGeometry(500, 200, 720, 850)
         self.setWindowTitle("Ong Amazonia Vivia")
         self.setStyleSheet("background-color: lightblue; color: black;")
 
@@ -124,25 +121,25 @@ class MinhaJanela(QMainWindow):
         menu_sobre.addAction(acao_mostrar)
         self.botao1 = QPushButton("Gravar", self.central_widget)
         self.botao1.setFixedSize(80, 30)
-        self.botao1.move(650,700)
+        self.botao1.move(630,780)
         self.botao1.setStyleSheet('background-color:red;color:white')
         self.botao1.clicked.connect(self.inserir_registro)
 
         self.botao2 = QPushButton("Voltar", self.central_widget)
         self.botao2.setFixedSize(80,30)
-        self.botao2.move(500,700)
+        self.botao2.move(400,780)
         self.botao2.setStyleSheet('background-color:green;color:white')
         self.botao2.clicked.connect(self.ocultar_itens)
 
         self.botao3 = QPushButton("Atualizar", self.central_widget)
         self.botao3.setFixedSize(80, 30)
-        self.botao3.move(650,700)
+        self.botao3.move(630,780)
         self.botao3.setStyleSheet('background-color:red;color:white')
         self.botao3.clicked.connect(self.atualizar_dados)
 
         self.botao4 = QPushButton("Voltar Consulta", self.central_widget)
         self.botao4.setFixedSize(120,30)
-        self.botao4.move(500,700)
+        self.botao4.move(400,780)
         self.botao4.setStyleSheet('background-color:green;color:white')
         self.botao4.clicked.connect(self.consultar)
 
@@ -339,7 +336,7 @@ class MinhaJanela(QMainWindow):
         self.combo_nomebeneficio.currentIndexChanged.connect(self.verificar_nomedobeneficio)
 
         linha=linha+30
-        self.loutrobeneficio = QLabel("Nome do Benefício:",self.central_widget)
+        self.loutrobeneficio = QLabel("Nome Benefício:",self.central_widget)
         self.loutrobeneficio.move(300,linha)
         self.loutrobeneficio.setStyleSheet('color: red; font-size:16px')
         self.loutrobeneficio.adjustSize()
@@ -363,12 +360,12 @@ class MinhaJanela(QMainWindow):
         self.combo_medicacao.addItems(["SIM","NÃO"])
         self.combo_medicacao.currentIndexChanged.connect(self.verificar_nomemedicacao)
 
-        self.lnomemedicacao = QLabel("Nome da Medicação:",self.central_widget)
-        self.lnomemedicacao.move(350,linha)
+        self.lnomemedicacao = QLabel("Nome Medicação:",self.central_widget)
+        self.lnomemedicacao.move(300,linha)
         self.lnomemedicacao.setStyleSheet('color: red; font-size:16px')
         self.lnomemedicacao.adjustSize()
         self.lenomemedicacao = QLineEdit("", self.central_widget)
-        self.lenomemedicacao.setGeometry(510,linha,200,25)
+        self.lenomemedicacao.setGeometry(450,linha,200,25)
         self.lenomemedicacao.setStyleSheet('background: white; color: black; font-size:18px;')
 
         linha=linha+25
@@ -377,11 +374,54 @@ class MinhaJanela(QMainWindow):
         self.linhacompo.setStyleSheet('color: blue; font-size:14px')
         self.linhacompo.adjustSize()
 
-        linha=linha+30
+        linha=linha+25
         # Criando a tabela
         self.btn_composicao = QPushButton("Adicionar Composicao Familiar",self.central_widget)
-        self.btn_composicao.setGeometry(10,linha,700,30)
+        self.btn_composicao.setGeometry(10,linha,700,20)
         self.btn_composicao.clicked.connect(self.abrir_composicao)
+
+        linha=linha+30
+        self.linhamoradia = QLabel("______________________________SITUAÇÃO DE MORADIAS_______________________________",self.central_widget)
+        self.linhamoradia.move(80,linha)
+        self.linhamoradia.setStyleSheet('color: blue; font-size:14px')
+        self.linhamoradia.adjustSize()
+
+        linha=linha+30
+        self.lmoradia = QLabel("Moradia:",self.central_widget)
+        self.lmoradia.move(10,linha)
+        self.lmoradia.setStyleSheet('color: black; font-size:16px')
+        self.lmoradia.adjustSize()
+        self.combo_moradia = QComboBox(self.central_widget)
+        self.combo_moradia.setGeometry(120,linha,120,25)
+        self.combo_moradia.addItems(["PRÓPRIA","ALUGADA", "CEDIDA"])
+        self.combo_moradia.currentIndexChanged.connect(self.verificar_moradia)
+
+        self.lvalor_aluguel = QLabel("Valor do aluguel:",self.central_widget)
+        self.lvalor_aluguel.move(300,linha)
+        self.lvalor_aluguel.setStyleSheet('color: red; font-size:16px')
+        self.lvalor_aluguel.adjustSize()
+        self.levalor_aluguel = QLineEdit("", self.central_widget)
+        self.levalor_aluguel.setGeometry(450,linha,90,25)
+        self.levalor_aluguel.setStyleSheet('background: white; color: black; font-size:18px;')
+        self.levalor_aluguel.setInputMask("99.999,00")  # Apenas números e "-" fixo
+
+        linha=linha+30
+        self.lparedes = QLabel("Paredes:",self.central_widget)
+        self.lparedes.move(10,linha)
+        self.lparedes.setStyleSheet('color: black; font-size:16px')
+        self.lparedes.adjustSize()
+        self.combo_paredes = QComboBox(self.central_widget)
+        self.combo_paredes.setGeometry(120,linha,120,25)
+        self.combo_paredes.addItems(["ALVERNARIA","MADEIRA", "OUTROS"])
+        self.combo_paredes.currentIndexChanged.connect(self.verificar_paredes)
+
+        self.lparede_outro = QLabel("Tipo de Parede:",self.central_widget)
+        self.lparede_outro.move(300,linha)
+        self.lparede_outro.setStyleSheet('color: red; font-size:16px')
+        self.lparede_outro.adjustSize()
+        self.leparede_outro = QLineEdit("", self.central_widget)
+        self.leparede_outro.setGeometry(450,linha,150,25)
+        self.leparede_outro.setStyleSheet('background: white; color: black; font-size:18px;')
 
         # Layout principale
         layout = QVBoxLayout(self.central_widget)
@@ -565,11 +605,13 @@ class MinhaJanela(QMainWindow):
         self.lmedicacao.setVisible(True)
         self.combo_medicacao.setVisible(True)
         self.linhacompo.setVisible(True)
-        #self.tabela_composicao.setVisible(True)
-        #self.botao_add.setVisible(True)
-        #self.botao_remove.setVisible(True)
         self.btn_composicao.setVisible(True)
         self.btn_composicao.setVisible(True)
+        self.linhamoradia.setVisible(True)
+        self.lmoradia.setVisible(True)
+        self.combo_moradia.setVisible(True)
+        self.lparedes.setVisible(True)
+        self.combo_paredes.setVisible(True)
     def consultar(self):
         self.ocultar_itens()
         self.carregar_tabela_consulta()
@@ -639,9 +681,16 @@ class MinhaJanela(QMainWindow):
         self.lnomemedicacao.setVisible(False)
         self.lenomemedicacao.setVisible(False)
         self.linhacompo.setVisible(False)
-        # self.tabela_composicao.setVisible(False)
-        #self.botao_add.setVisible(False)
         self.btn_composicao.setVisible(False)
+        self.linhamoradia.setVisible(False)
+        self.lmoradia.setVisible(False)
+        self.combo_moradia.setVisible(False)
+        self.lvalor_aluguel.setVisible(False)
+        self.levalor_aluguel.setVisible(False)
+        self.lparedes.setVisible(False)
+        self.combo_paredes.setVisible(False)
+        self.leparede_outro.setVisible(False)
+        self.lparede_outro.setVisible(False)
     def carregar_dados(self):
                 vnome=self.lenome.text()
                 vrg=self.lerg.text()
@@ -874,6 +923,22 @@ class MinhaJanela(QMainWindow):
         else:
             self.lnomemedicacao.setVisible(False)
             self.lenomemedicacao.setVisible(False)
+    def verificar_moradia(self):
+        """Mostra o campo de valor do aluguel se ALGUADA."""
+        if self.combo_moradia.currentText() == "ALUGADA":
+            self.lvalor_aluguel.setVisible(True)
+            self.levalor_aluguel.setVisible(True)
+        else:
+            self.lvalor_aluguel.setVisible(False)
+            self.levalor_aluguel.setVisible(False)
+    def verificar_paredes(self):
+        """Mostra o campo de tipo de parede se OUTROS."""
+        if self.combo_paredes.currentText() == "OUTROS":
+            self.lparede_outro.setVisible(True)
+            self.leparede_outro.setVisible(True)
+        else:
+            self.lparede_outro.setVisible(False)
+            self.leparede_outro.setVisible(False)
     def filter_table(self):
         filtro = self.search_box.text().lower()
         for row in range(self.tabela.rowCount()):
