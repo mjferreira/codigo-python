@@ -82,9 +82,6 @@ class TableWindow(QDialog):
             combo.setCurrentText(parentesco)
             self.tabela_composicao.setCellWidget(row_count, 1, combo)
 
-
-
-
 class MinhaJanela(QMainWindow):
     def __init__(self):
         super().__init__()
