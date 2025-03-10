@@ -17,7 +17,7 @@ class TableWindow(QDialog):
         self.tabela_composicao.setColumnWidth(0, 200)
         self.tabela_composicao.setColumnWidth(1, 100)
         self.tabela_composicao.setColumnWidth(2, 395)
-#        self.tabela_composicao.setGeometry(10,linha,700,100)
+
 
         self.botao_add = QPushButton("Adicionar")
         self.botao_add.clicked.connect(self.adiciona_composicao)
@@ -201,7 +201,7 @@ class MinhaJanela(QMainWindow):
         self.lecep.setInputMask("99999-999")
 
         linha=linha+30
-    # Rótulo para a zona
+
         self.l_end = QLabel("ENDEREÇO", self.central_widget)
         self.l_end.move(10,linha)
         self.l_end.setStyleSheet('color: red; font-size:16px;')
@@ -423,6 +423,24 @@ class MinhaJanela(QMainWindow):
         self.leparede_outro.setGeometry(450,linha,150,25)
         self.leparede_outro.setStyleSheet('background: white; color: black; font-size:18px;')
 
+        linha=linha+30
+        self.ltelhado = QLabel("Telhado:",self.central_widget)
+        self.ltelhado.move(10,linha)
+        self.ltelhado.setStyleSheet('color: black; font-size:16px')
+        self.ltelhado.adjustSize()
+        self.combo_telhado = QComboBox(self.central_widget)
+        self.combo_telhado.setGeometry(120,linha,120,25)
+        self.combo_telhado.addItems(["BRASILIT","GALVANIZADA", "BARRO", "OUTROS"])
+        self.combo_telhado.currentIndexChanged.connect(self.verificar_telhado)
+
+        self.ltelhado_outro = QLabel("Tipo de Telhado:",self.central_widget)
+        self.ltelhado_outro.move(300,linha)
+        self.ltelhado_outro.setStyleSheet('color: red; font-size:16px')
+        self.ltelhado_outro.adjustSize()
+        self.letelhado_outro = QLineEdit("", self.central_widget)
+        self.letelhado_outro.setGeometry(450,linha,150,25)
+        self.letelhado_outro.setStyleSheet('background: white; color: black; font-size:18px;')       
+
         # Layout principale
         layout = QVBoxLayout(self.central_widget)
         # Campo de busca
@@ -612,6 +630,8 @@ class MinhaJanela(QMainWindow):
         self.combo_moradia.setVisible(True)
         self.lparedes.setVisible(True)
         self.combo_paredes.setVisible(True)
+        self.combo_telhado.setVisible(True)
+        self.ltelhado.setVisible(True)      
     def consultar(self):
         self.ocultar_itens()
         self.carregar_tabela_consulta()
@@ -691,6 +711,10 @@ class MinhaJanela(QMainWindow):
         self.combo_paredes.setVisible(False)
         self.leparede_outro.setVisible(False)
         self.lparede_outro.setVisible(False)
+        self.letelhado_outro.setVisible(False)
+        self.ltelhado_outro.setVisible(False)
+        self.combo_telhado.setVisible(False)
+        self.ltelhado.setVisible(False)
     def carregar_dados(self):
                 vnome=self.lenome.text()
                 vrg=self.lerg.text()
@@ -939,6 +963,14 @@ class MinhaJanela(QMainWindow):
         else:
             self.lparede_outro.setVisible(False)
             self.leparede_outro.setVisible(False)
+    def verificar_telhado(self):
+        """Mostra o campo de tipo de telhado se OUTROS."""
+        if self.combo_telhado.currentText() == "OUTROS":
+            self.ltelhado_outro.setVisible(True)
+            self.letelhado_outro.setVisible(True)
+        else:
+            self.ltelhado_outro.setVisible(False)
+            self.letelhado_outro.setVisible(False)
     def filter_table(self):
         filtro = self.search_box.text().lower()
         for row in range(self.tabela.rowCount()):
