@@ -66,7 +66,6 @@ class TableWindow(QDialog):
             parentesco_item = vparentesco_widget.currentText() if vparentesco_widget else ""
             local_item = self.tabela_composicao.item(row,2)
             data.append((nome_item.text(), parentesco_item, local_item.text()))
-        print(data)
         return data
 
     def load_data(self, data):
