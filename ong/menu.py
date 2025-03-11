@@ -1,115 +1,85 @@
-import sqlite3
+import sys
 from PyQt6.QtWidgets import (
-    QApplication, QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem,
-    QPushButton, QHBoxLayout, QComboBox
+    QApplication, QMainWindow, QTableWidget, QTableWidgetItem,
+    QVBoxLayout, QWidget, QComboBox
 )
 
-class EditableTable(QWidget):
+
+class TabelaWidget(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        # Configuração da Janela
-        self.setWindowTitle("Tabela Interativa")
-        self.setGeometry(100, 100, 500, 300)
+        self.setWindowTitle("Tabela de Parentesco")
+        self.resize(500, 300)
 
-        # Layout principal
-        layout = QVBoxLayout(self)
+        # Criar widget principal
+        self.central_widget = QWidget()
+        self.setCentralWidget(self.central_widget)
 
-        # Criando a tabela
-        self.table = QTableWidget(0, 3)  # Inicia com 0 linhas e 3 colunas
-        self.table.setHorizontalHeaderLabels(["Nome", "Parentesco", "Local"])
-        self.table.setColumnWidth(0, 150)
-        self.table.setColumnWidth(1, 120)
-        self.table.setColumnWidth(2, 150)
-        layout.addWidget(self.table)
+        # Criar tabela com 3 colunas
+        self.tabela = QTableWidget(5, 3)  # 5 linhas, 3 colunas
+        self.tabela.setHorizontalHeaderLabels(["Nome", "Idade", "Parentesco"])
 
-        # Botões de controle
-        button_layout = QHBoxLayout()
+        # Lista de opções do ComboBox
+        self.opcoes_unicas = ["Esposo", "Pai", "Mãe"]  # Essas opções podem ser escolhidas apenas uma vez
+        self.opcoes_repetidas = ["Vô", "Vó", "Filho", "Enteado", "Cunhado", "Genro", "Sogro", "Nora"]  # Podem se repetir
 
-        self.btn_add = QPushButton("Adicionar Linha")
-        self.btn_add.clicked.connect(self.add_row)
-        button_layout.addWidget(self.btn_add)
+        # Adicionar combobox na terceira coluna
+        for row in range(self.tabela.rowCount()):
+            self.adicionar_combobox(row)
 
-        self.btn_remove = QPushButton("Remover Linha")
-        self.btn_remove.clicked.connect(self.remove_row)
-        button_layout.addWidget(self.btn_remove)
+        # Layout
+        layout = QVBoxLayout()
+        layout.addWidget(self.tabela)
+        self.central_widget.setLayout(layout)
 
-        self.btn_save = QPushButton("Salvar no Banco")
-        self.btn_save.clicked.connect(self.save_to_db)
-        button_layout.addWidget(self.btn_save)
+    def adicionar_combobox(self, row):
+        """ Adiciona um QComboBox na terceira coluna de cada linha """
+        combobox = QComboBox()
+        combobox.addItems(["Nenhum"] + self.opcoes_unicas + self.opcoes_repetidas)  # Adiciona "Nenhum" como padrão
+        combobox.currentIndexChanged.connect(lambda: self.atualizar_opcoes())
+        self.tabela.setCellWidget(row, 2, combobox)
 
-        layout.addLayout(button_layout)
+    def atualizar_opcoes(self):
+        """ Remove das opções os itens únicos já selecionados em outras linhas """
+        selecionados = set()
 
-        # Criar banco de dados e carregar dados
-        self.create_database()
-        self.load_data()
+        # Percorre todas as linhas para capturar seleções de opções únicas
+        for row in range(self.tabela.rowCount()):
+            combobox = self.tabela.cellWidget(row, 2)
+            if combobox:
+                opcao = combobox.currentText()
+                if opcao in self.opcoes_unicas:
+                    selecionados.add(opcao)
 
-    def create_database(self):
-        """Cria a tabela no banco de dados SQLite se não existir"""
-        conn = sqlite3.connect("familia.db")
-        cursor = conn.cursor()
-        cursor.execute('''CREATE TABLE IF NOT EXISTS parentesco (
-                            id INTEGER PRIMARY KEY AUTOINCREMENT,
-                            nome TEXT,
-                            parentesco TEXT,
-                            local TEXT)''')
-        conn.commit()
-        conn.close()
+        # Atualiza cada combobox removendo opções já escolhidas
+        for row in range(self.tabela.rowCount()):
+            combobox = self.tabela.cellWidget(row, 2)
+            if combobox:
+                opcao_atual = combobox.currentText()
 
-    def load_data(self):
-        """Carrega os dados do banco de dados para a tabela"""
-        conn = sqlite3.connect("familia.db")
-        cursor = conn.cursor()
-        cursor.execute("SELECT nome, parentesco, local FROM parentesco")
-        rows = cursor.fetchall()
-        conn.close()
+                # 🔴 Desativar o sinal antes de modificar o combobox para evitar loop infinito
+                combobox.blockSignals(True)
+                combobox.clear()
+                combobox.addItem("Nenhum")
 
-        # Adiciona os dados à tabela
-        for row in rows:
-            self.add_row(row[0], row[1], row[2])
+                # Adiciona opções únicas apenas se não estiverem selecionadas em outra linha
+                for opcao in self.opcoes_unicas:
+                    if opcao not in selecionados or opcao == opcao_atual:
+                        combobox.addItem(opcao)
 
-    def add_row(self, nome="", parentesco="Pai", local=""):
-        """Adiciona uma nova linha com valores opcionais"""
-        row_position = self.table.rowCount()
-        self.table.insertRow(row_position)
+                # Adiciona opções repetidas sempre disponíveis
+                for opcao in self.opcoes_repetidas:
+                    combobox.addItem(opcao)
 
-        self.table.setItem(row_position, 0, QTableWidgetItem(nome))
-        self.table.setItem(row_position, 2, QTableWidgetItem(local))
+                combobox.setCurrentText(opcao_atual)  # Mantém a opção selecionada
+                
+                # 🟢 Reativar o sinal após modificar o combobox
+                combobox.blockSignals(False)
 
-        combo = QComboBox()
-        combo.addItems(["Pai", "Mãe", "Filho", "Avô", "Avó", "Sobrinho"])
-        combo.setCurrentText(parentesco)
-        self.table.setCellWidget(row_position, 1, combo)
 
-    def remove_row(self):
-        """Remove a linha selecionada"""
-        selected = self.table.currentRow()
-        if selected >= 0:
-            self.table.removeRow(selected)
-
-    def save_to_db(self):
-        """Salva os dados da tabela no banco de dados"""
-        conn = sqlite3.connect("familia.db")
-        cursor = conn.cursor()
-
-        # Limpa os dados antes de salvar para evitar duplicação
-        cursor.execute("DELETE FROM parentesco")
-
-        for row in range(self.table.rowCount()):
-            nome = self.table.item(row, 0).text() if self.table.item(row, 0) else ""
-            local = self.table.item(row, 2).text() if self.table.item(row, 2) else ""
-            parentesco_widget = self.table.cellWidget(row, 1)  # Obtém o QComboBox
-            parentesco = parentesco_widget.currentText() if parentesco_widget else ""
-
-            cursor.execute("INSERT INTO parentesco (nome, parentesco, local) VALUES (?, ?, ?)",
-                           (nome, parentesco, local))
-
-        conn.commit()
-        conn.close()
-        print("Dados salvos com sucesso!")
-
-# Executando a aplicação
-app = QApplication([])
-window = EditableTable()
-window.show()
-app.exec()
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = TabelaWidget()
+    window.show()
+    sys.exit(app.exec())
