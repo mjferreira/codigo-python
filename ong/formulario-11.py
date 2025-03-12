@@ -5,7 +5,7 @@ from PyQt6.QtGui import QAction, QIcon, QTextCursor
 from PyQt6.QtCore import QSize
 import banco
 
-class TableWindow(QDialog):
+class TableWindow_nova(QDialog):
     def __init__(self, parent=None, data=None):
         super().__init__(parent)
 
@@ -121,6 +121,83 @@ class TableWindow(QDialog):
         combobox.addItems(self.opcoes_unicas + self.opcoes_repetidas)  # Adiciona "Nenhum" como padrão
         combo.setCurrentText(parentesco)
         self.tabela_composicao.setCellWidget(row_position, 1, combobox)  
+
+
+class TableWindow(QDialog):
+    def __init__(self, parent=None, data=None):
+        super().__init__(parent)
+
+        self.setWindowTitle("Composição Familiar")
+        self.resize(720, 400)
+        # Criando a tabela
+        self.tabela_composicao = QTableWidget(0, 3)  # Inicia com 0 linhas e 3 colunas
+        self.tabela_composicao.setHorizontalHeaderLabels(["Nome", "Parentesco", "Escola/Local de Trabalho"])
+        self.tabela_composicao.setColumnWidth(0, 200)
+        self.tabela_composicao.setColumnWidth(1, 100)
+        self.tabela_composicao.setColumnWidth(2, 395)
+
+
+        self.botao_add = QPushButton("Adicionar")
+        self.botao_add.clicked.connect(self.adiciona_composicao)
+        self.botao_remove = QPushButton("Remover")
+        self.botao_remove.clicked.connect(self.remove_composicao)
+        self.btn_ok = QPushButton("OK")
+        self.btn_ok.clicked.connect(self.accept)
+
+        layout = QVBoxLayout()
+        layout.addWidget(self.tabela_composicao)
+        btn_layout = QHBoxLayout()
+        btn_layout.addWidget(self.botao_add)
+        btn_layout.addWidget(self.botao_remove)
+        layout.addLayout(btn_layout)
+        layout.addWidget(self.btn_ok)
+        self.setLayout(layout)
+
+        # Preencher tabela com dados existentes
+        if data:
+            self.load_data(data)
+
+    def adiciona_composicao(self, nome="", parentesco="Filho(a)", local=""):
+        """Adiciona uma nova linha com valores opcionais"""
+        row_position = self.tabela_composicao.rowCount()
+        self.tabela_composicao.insertRow(row_position)
+        self.tabela_composicao.setItem(row_position, 0, QTableWidgetItem(nome))
+        self.tabela_composicao.setItem(row_position, 2, QTableWidgetItem(local))
+        combo = QComboBox()
+        combo.addItems(["Esposo(a)","Pai", "Mãe", "Filho(a)", "Avô(ó)","Sobrinho(a)","Enteado(a)","Tio(a)", "Gênro", "Nora", "Primo(a)"])
+        combo.setCurrentText(parentesco)
+        self.tabela_composicao.setCellWidget(row_position, 1, combo)
+
+    def remove_composicao(self):
+        """Remove a linha selecionada"""
+        selected = self.tabela_composicao.currentRow()
+        if selected >= 0:
+            self.tabela_composicao.removeRow(selected)
+
+
+    def get_data(self):
+        data = []
+        for row in range(self.tabela_composicao.rowCount()):
+            nome_item = self.tabela_composicao.item(row, 0)
+            # parentesco_item = self.tabela_composicao.item(row, 1)
+            vparentesco_widget = self.tabela_composicao.cellWidget(row, 1)  # Obtém o QComboBox
+            parentesco_item = vparentesco_widget.currentText() if vparentesco_widget else ""
+            local_item = self.tabela_composicao.item(row,2)
+            data.append((nome_item.text(), parentesco_item, local_item.text()))
+        return data
+
+    def load_data(self, data):
+        """ Preenche a tabela com os dados passados """
+        for nome, parentesco, local in data:
+            row_count = self.tabela_composicao.rowCount()
+            self.tabela_composicao.insertRow(row_count)
+            self.tabela_composicao.setItem(row_count, 0, QTableWidgetItem(nome))
+            # self.tabela_composicao.setItem(row_count, 1, QTableWidgetItem(parentesco))
+            self.tabela_composicao.setItem(row_count, 2, QTableWidgetItem(local))
+            combo = QComboBox()
+            combo.addItems(["Esposo(a)","Pai", "Mãe", "Filho(a)", "Avô(ó)","Sobrinho(a)","Enteado(a)","Tio(a)"])
+            combo.setCurrentText(parentesco)
+            self.tabela_composicao.setCellWidget(row_count, 1, combo)
 
 class ObservacaoWindow(QDialog):
     def __init__(self, parent=None, texto_atual=""):
@@ -470,7 +547,7 @@ class MinhaJanela(QMainWindow):
         self.lmoradia.adjustSize()
         self.combo_moradia = QComboBox(self.central_widget)
         self.combo_moradia.setGeometry(120,linha,135,25)
-        self.combo_moradia.addItems(["PRÓPRIA","ALUGADA", "CEDIDA"])
+        self.combo_moradia.addItems(["Própria","Alugada", "Cedida"])
         self.combo_moradia.currentIndexChanged.connect(self.verificar_moradia)
 
         self.lvalor_aluguel = QLabel("Valor do aluguel:",self.central_widget)
@@ -489,7 +566,7 @@ class MinhaJanela(QMainWindow):
         self.lparedes.adjustSize()
         self.combo_paredes = QComboBox(self.central_widget)
         self.combo_paredes.setGeometry(120,linha,135,25)
-        self.combo_paredes.addItems(["ALVERNARIA","MADEIRA", "OUTROS"])
+        self.combo_paredes.addItems(["Alvenaria","Madeira", "Outros"])
         self.combo_paredes.currentIndexChanged.connect(self.verificar_paredes)
 
         self.lparede_outro = QLabel("Tipo de Parede:",self.central_widget)
@@ -507,7 +584,7 @@ class MinhaJanela(QMainWindow):
         self.ltelhado.adjustSize()
         self.combo_telhado = QComboBox(self.central_widget)
         self.combo_telhado.setGeometry(120,linha,135,25)
-        self.combo_telhado.addItems(["BRASILIT","GALVANIZADA", "BARRO", "OUTROS"])
+        self.combo_telhado.addItems(["Brasilit","Galvanizada", "Barro", "Outros"])
         self.combo_telhado.currentIndexChanged.connect(self.verificar_telhado)
 
         self.ltelhado_outro = QLabel("Tipo de Telhado:",self.central_widget)
@@ -525,7 +602,7 @@ class MinhaJanela(QMainWindow):
         self.lpiso.adjustSize()
         self.combo_piso = QComboBox(self.central_widget)
         self.combo_piso.setGeometry(120,linha,135,25)
-        self.combo_piso.addItems(["BATIDO","CERÂMICA", "PORCELANATO", "OUTROS"])
+        self.combo_piso.addItems(["Batido","Cerâmica", "Porcelanato", "Outros"])
         self.combo_piso.currentIndexChanged.connect(self.verificar_piso)
 
         self.lpiso_outro = QLabel("Tipo de piso:",self.central_widget)
@@ -573,12 +650,12 @@ class MinhaJanela(QMainWindow):
         dados = banco.consultar(vsql)
         self.tabela.setRowCount(len(dados))
         self.tabela.setColumnCount(5)  # ID, Nome, Idade, Ações
-        self.tabela.setColumnWidth(0, 440)   # Coluna 0 com 50 pixels
+        self.tabela.setColumnWidth(0, 300)   # Coluna 0 com 50 pixels
         self.tabela.setColumnWidth(1, 105)  # Coluna 1 com 150 pixels
         self.tabela.setColumnWidth(2, 105)  # Coluna 2 com 100 pixels
         self.tabela.setColumnWidth(3, 16)  # Coluna 2 com 100 pixels
         self.tabela.setColumnWidth(4, 16)  # Coluna 2 com 100 pixels
-        self.tabela.setHorizontalHeaderLabels(["Nome", "CPF", "NIS", "", ""])
+        self.tabela.setHorizontalHeaderLabels(["Nome", "CPF", "NIS", "Editar", "Remover", "Imprimir"])
         for linha_idx, linha in enumerate(dados):
             for col_idx, valor in enumerate(linha):
                 self.tabela.setItem(linha_idx, col_idx, QTableWidgetItem(str(valor)))
@@ -625,10 +702,13 @@ class MinhaJanela(QMainWindow):
         nomebeneficio=resultado[0][17]
         medicacao=resultado[0][18]
         self.lenomemedicacao.setText(resultado[0][19])
+        self.combo_moradia.setCurrentText=resultado[0][20]
+        self.levalor_aluguel=resultado[0][21]
+        paredes=resultado[0][22]
+        telhado=resultado[0][23]
+        piso=resultado[0][24]
+        self.data_observacao=resultado[0][25]
         self.combo_medicacao.setCurrentText(medicacao)
-        print("--------------")
-        print(self.combo_recbeneficio.currentText())
-        print(nomebeneficio)
         if len(nomebeneficio) != 0:
             if nomebeneficio in ["BPC","Bolsa Família", "Aponsentadoria"]:
                 self.combo_nomebeneficio.setCurrentText(nomebeneficio)
@@ -646,6 +726,7 @@ class MinhaJanela(QMainWindow):
             self.lenomemedicacao.setVisible(True)
         elif len(medicacao) == 0:
             self.combo_medicacao.setCurrentIndex(-1)
+
 
         if id_bairro == None:
             self.combo_zona.setCurrentIndex(-1)
@@ -875,6 +956,21 @@ class MinhaJanela(QMainWindow):
             vnomebeneficio=""
         vmedicacao=self.combo_medicacao.currentText()
         vnomemedicacao=self.lenomemedicacao.text()
+        vmoradia=self.combo_moradia.currentText()
+        if vmoradia != "Alugada":
+            valuguel=""
+        else:
+            valuguel=self.levalor_aluguel.text()
+        vparedes=self.combo_paredes.currentText()
+        if vparedes == "Outros":
+            vparedes=self.leparede_outro.text()
+        vtelhado=self.combo_telhado.currentText()
+        if vtelhado == "Outros":
+            vtelhado=self.letelhado_outro.text() 
+        vpiso=self.combo_piso.currentText()
+        if vpiso == "Outros":
+            vpiso=self.lepiso_outro.text()
+        vobs=self.data_observacao
         vsql="SELECT N_ID FROM tb_bairro WHERE T_BAIRRO = "+ '"' + vbairro + '"'
         vbairro=[row[0] for row in banco.consultar(vsql)]
         # vcpf=self.lecpf.text().replace("-", "").replace(".", "")
@@ -890,8 +986,16 @@ class MinhaJanela(QMainWindow):
             QMessageBox.critical(self, "Erro Crítico","Nome de Benefício deve ser definido !!!", QMessageBox.StandardButton.Ok)
         elif self.combo_medicacao.currentText() == "SIM" and len(vnomemedicacao) == 0:
             QMessageBox.critical(self, "Erro Crítico","Nome da Medicação deve ser informada !!!", QMessageBox.StandardButton.Ok)
+        elif self.combo_moradia.currentText() == "Alugada" and len(valuguel) == 0:
+            QMessageBox.critical(self, "Erro Crítico","Valor do aluguel deve ser informado !!!", QMessageBox.StandardButton.Ok)
+        elif self.combo_paredes.currentText() == "Outros" and len(vparedes) == 0:
+            QMessageBox.critical(self, "Erro Crítico","Tipo de  Parede deve ser informada !!!", QMessageBox.StandardButton.Ok)
+        elif self.combo_telhado.currentText() == "Outros" and len(vtelhado) == 0:
+            QMessageBox.critical(self, "Erro Crítico","Tipo de  Telhaod deve ser informado !!!", QMessageBox.StandardButton.Ok)
+        elif self.combo_piso.currentText() == "Outros" and len(vpiso) == 0:
+            QMessageBox.critical(self, "Erro Crítico","Tipo de Piso deve ser informado!!!", QMessageBox.StandardButton.Ok)
         else:
-            vsql="INSERT INTO tb_pessoa (T_NOME, T_RG, T_CPF, T_MAE, T_CPFMAE, T_PAI, T_CPFPAI, N_BAIRRO, T_NIS, T_FONE, T_CEP, T_GRAU_ENSINO, T_ESCOLA, T_SERIE_ANO, T_TRABALHA, T_RENDA, T_RECBENEFICIO, T_NOMEBENEFICIO, T_MEDICACAO, T_NOMEMEDICACAO) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')" %(vnome, vrg, vcpf, vmae, vcpfmae, vpai, vcpfpai, vbairro[0], vnis, vfone, vcep, vgrau_ensino, vescola, vserieano, vtrabalha, vrenda, vrecbeneficio, vnomebeneficio, vmedicacao, vnomemedicacao)
+            vsql="INSERT INTO tb_pessoa (T_NOME, T_RG, T_CPF, T_MAE, T_CPFMAE, T_PAI, T_CPFPAI, N_BAIRRO, T_NIS, T_FONE, T_CEP, T_GRAU_ENSINO, T_ESCOLA, T_SERIE_ANO, T_TRABALHA, T_RENDA, T_RECBENEFICIO, T_NOMEBENEFICIO, T_MEDICACAO, T_NOMEMEDICACAO, T_MORADIA, T_VALOR_ALUGUEL, T_PAREDES, T_TELHADO, T_PISO, T_OBS) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')" %(vnome, vrg, vcpf, vmae, vcpfmae, vpai, vcpfpai, vbairro[0], vnis, vfone, vcep, vgrau_ensino, vescola, vserieano, vtrabalha, vrenda, vrecbeneficio, vnomebeneficio, vmedicacao, vnomemedicacao, vmoradia, valuguel, vparedes, vtelhado, vpiso, vobs)
             print(vsql)
             banco.atualizar(vsql)
             self.gravar_composicao()
@@ -919,7 +1023,14 @@ class MinhaJanela(QMainWindow):
         self.combo_nomebeneficio.setCurrentIndex(-1)
         self.combo_medicacao.setCurrentIndex(1)
         self.lenomemedicacao.clear()
-        #self.tabela_composicao.setRowCount(0)
+        self.combo_moradia.setCurrentIndex(1)
+        self.levalor_aluguel.clear()
+        self.combo_paredes.setCurrentIndex(1)
+        self.leparede_outro.clear()
+        self.combo_telhado.setCurrentIndex(1)
+        self.letelhado_outro.clear()
+        self.combo_piso.setCurrentIndex(1)
+        self.lepiso_outro.clear()
         self.data_composicao=[]
         self.data_observacao=""
     def atualizar_dados(self):
@@ -949,6 +1060,21 @@ class MinhaJanela(QMainWindow):
             vnomebeneficio=""
         vmedicacao=self.combo_medicacao.currentText()
         vnomemedicacao=self.lenomemedicacao.text()
+        vmoradia=self.combo_moradia.currentText()
+        if vmoradia != "Alugada":
+            valuguel=""
+        else:
+            valuguel=self.levalor_aluguel.text()
+        vparedes=self.combo_paredes.currentText()
+        if vparedes == "Outros":
+            vparedes=self.leparede_outro.text()
+        vtelhado=self.combo_telhado.currentText()
+        if vtelhado == "Outros":
+            vtelhado=self.letelhado_outro.text() 
+        vpiso=self.combo_piso.currentText()
+        if vpiso == "Outros":
+            vpiso=self.lepiso_outro.text()
+        vobs=self.data_observacao
         vsql="SELECT N_ID FROM tb_bairro WHERE T_BAIRRO = "+ '"' + vbairro + '"'
         vbairro=[row[0] for row in banco.consultar(vsql)]
         if not self.cpf_valido(vcpf):
@@ -961,8 +1087,16 @@ class MinhaJanela(QMainWindow):
             QMessageBox.critical(self, "Erro Crítico","Nome de Benefício deve ser definido !!!", QMessageBox.StandardButton.Ok)
         elif self.combo_medicacao.currentText() == "SIM" and len(vnomemedicacao) == 0:
             QMessageBox.critical(self, "Erro Crítico","Nome da Medicação deve ser informada !!!", QMessageBox.StandardButton.Ok)
+        elif self.combo_moradia.currentText() == "Alugada" and len(valuguel) == 0:
+            QMessageBox.critical(self, "Erro Crítico","Valor do aluguel deve ser informado !!!", QMessageBox.StandardButton.Ok)
+        elif self.combo_paredes.currentText() == "Outros" and len(vparedes) == 0:
+            QMessageBox.critical(self, "Erro Crítico","Tipo de  Parede deve ser informada !!!", QMessageBox.StandardButton.Ok)
+        elif self.combo_telhado.currentText() == "Outros" and len(vtelhado) == 0:
+            QMessageBox.critical(self, "Erro Crítico","Tipo de  Telhaod deve ser informado !!!", QMessageBox.StandardButton.Ok)
+        elif self.combo_piso.currentText() == "Outros" and len(vpiso) == 0:
+            QMessageBox.critical(self, "Erro Crítico","Tipo de Piso deve ser informado!!!", QMessageBox.StandardButton.Ok)            
         else:
-            vsql= "UPDATE tb_pessoa SET T_NOME='"+vnome+"',T_RG='"+vrg+"',T_CPF='"+vcpf+"',T_MAE='"+vmae+"',T_CPFMAE='"+vcpfmae+"',T_PAI='"+vpai+"',T_CPFPAI='"+vcpfpai+"',N_BAIRRO="+str(vbairro[0])+",T_NIS='"+vnis+"',T_FONE='"+vfone+"',T_CEP='"+vcep+"',T_GRAU_ENSINO='"+vgrau_ensino+"',T_ESCOLA='"+vescola+"',T_SERIE_ANO='"+vserieano+"',T_TRABALHA='"+vtrabalha+"',T_RENDA='"+vrenda+"',T_RECBENEFICIO='"+vrecbeneficio+"',T_NOMEBENEFICIO='"+vnomebeneficio+"',T_MEDICACAO='"+vmedicacao+"',T_NOMEMEDICACAO='"+vnomemedicacao+"' WHERE T_CPF="+vcpf
+            vsql= "UPDATE tb_pessoa SET T_NOME='"+vnome+"',T_RG='"+vrg+"',T_CPF='"+vcpf+"',T_MAE='"+vmae+"',T_CPFMAE='"+vcpfmae+"',T_PAI='"+vpai+"',T_CPFPAI='"+vcpfpai+"',N_BAIRRO="+str(vbairro[0])+",T_NIS='"+vnis+"',T_FONE='"+vfone+"',T_CEP='"+vcep+"',T_GRAU_ENSINO='"+vgrau_ensino+"',T_ESCOLA='"+vescola+"',T_SERIE_ANO='"+vserieano+"',T_TRABALHA='"+vtrabalha+"',T_RENDA='"+vrenda+"',T_RECBENEFICIO='"+vrecbeneficio+"',T_NOMEBENEFICIO='"+vnomebeneficio+"',T_MEDICACAO='"+vmedicacao+"',T_NOMEMEDICACAO='"+vnomemedicacao+"',T_MORADIA='"+vmoradia+"',T_VALOR_ALUGUEL='"+valuguel+"',T_PAREDES='"+vparedes+"',T_TELHADO='"+vtelhado+"',T_PISO='"+vpiso+"',T_OBS='"+vobs+"' WHERE T_CPF="+vcpf
             print(vsql)
             banco.atualizar(vsql)
             self.gravar_composicao()
@@ -1066,7 +1200,7 @@ class MinhaJanela(QMainWindow):
             self.lenomemedicacao.setVisible(False)
     def verificar_moradia(self):
         """Mostra o campo de valor do aluguel se ALGUADA."""
-        if self.combo_moradia.currentText() == "ALUGADA":
+        if self.combo_moradia.currentText() == "Alugada":
             self.lvalor_aluguel.setVisible(True)
             self.levalor_aluguel.setVisible(True)
         else:
@@ -1074,7 +1208,7 @@ class MinhaJanela(QMainWindow):
             self.levalor_aluguel.setVisible(False)
     def verificar_paredes(self):
         """Mostra o campo de tipo de parede se OUTROS."""
-        if self.combo_paredes.currentText() == "OUTROS":
+        if self.combo_paredes.currentText() == "Outros":
             self.lparede_outro.setVisible(True)
             self.leparede_outro.setVisible(True)
         else:
@@ -1082,7 +1216,7 @@ class MinhaJanela(QMainWindow):
             self.leparede_outro.setVisible(False)
     def verificar_telhado(self):
         """Mostra o campo de tipo de telhado se OUTROS."""
-        if self.combo_telhado.currentText() == "OUTROS":
+        if self.combo_telhado.currentText() == "Outros":
             self.ltelhado_outro.setVisible(True)
             self.letelhado_outro.setVisible(True)
         else:
@@ -1090,7 +1224,7 @@ class MinhaJanela(QMainWindow):
             self.letelhado_outro.setVisible(False)
     def verificar_piso(self):
         """Mostra o campo de tipo de piso se OUTROS."""
-        if self.combo_piso.currentText() == "OUTROS":
+        if self.combo_piso.currentText() == "Outros":
             self.lpiso_outro.setVisible(True)
             self.lepiso_outro.setVisible(True)
         else:
