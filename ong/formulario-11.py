@@ -5,123 +5,6 @@ from PyQt6.QtGui import QAction, QIcon, QTextCursor
 from PyQt6.QtCore import QSize
 import banco
 
-class TableWindow_nova(QDialog):
-    def __init__(self, parent=None, data=None):
-        super().__init__(parent)
-
-        self.setWindowTitle("Composição Familiar")
-        self.resize(700, 400)
-        # Criando a tabela
-        self.tabela_composicao = QTableWidget(0, 3)  # Inicia com 0 linhas e 3 colunas
-        self.tabela_composicao.setHorizontalHeaderLabels(["Nome", "Parentesco", "Escola/Local de Trabalho"])
-        self.tabela_composicao.setColumnWidth(0, 200)
-        self.tabela_composicao.setColumnWidth(1, 100)
-        self.tabela_composicao.setColumnWidth(2, 395)
-
-
-        self.botao_add = QPushButton("Adicionar")
-        self.botao_add.clicked.connect(self.adiciona_composicao)
-        self.botao_remove = QPushButton("Remover")
-        self.botao_remove.clicked.connect(self.remove_composicao)
-        self.btn_ok = QPushButton("OK")
-        self.btn_ok.clicked.connect(self.accept)
-
-        layout = QVBoxLayout()
-        layout.addWidget(self.tabela_composicao)
-        btn_layout = QHBoxLayout()
-        btn_layout.addWidget(self.botao_add)
-        btn_layout.addWidget(self.botao_remove)
-        layout.addLayout(btn_layout)
-        layout.addWidget(self.btn_ok)
-        self.setLayout(layout)
-        self.opcoes_unicas = ["Esposo(a)", "Pai", "Mãe"]  # Essas opções podem ser escolhidas apenas uma vez
-        self.opcoes_repetidas = ["AVô(á)", "Filho(a)", "Enteado(a)", "Cunhado(a)", "Genro", "Sogro(a)", "Nora", "Tio(a)", "Sobrinho(a)", "Primo(a)"]  # Podem se repetir
-
-
-        # Preencher tabela com dados existentes
-        if data:
-            self.load_data(data)
-
-    def adiciona_composicao(self, nome="", parentesco="Filho(a)", local=""):
-        """Adiciona uma nova linha com valores opcionais"""
-           # Lista de opções do ComboBox
-        row_position = self.tabela_composicao.rowCount()
-        self.tabela_composicao.insertRow(row_position)
-        self.tabela_composicao.setItem(row_position, 0, QTableWidgetItem(nome))
-        self.tabela_composicao.setItem(row_position, 2, QTableWidgetItem(local))
-        combobox = QComboBox()
-        #combobox.addItems(self.opcoes_unicas + self.opcoes_repetidas)  # Adiciona "Nenhum" como padrão
-        self.atualizar_opcoes()
-        # combobox.currentIndexChanged.connect(lambda: self.atualizar_opcoes())
-        self.tabela_composicao.setCellWidget(row_position, 1, combobox)       
-
-    def atualizar_opcoes(self):
-        """ Remove das opções os itens únicos já selecionados em outras linhas """
-        selecionados = set()
-
-        # Percorre todas as linhas para capturar seleções de opções únicas
-        for row in range(self.tabela_composicao.rowCount()):
-            combobox = self.tabela_composicao.cellWidget(row, 2)
-            if combobox:
-                opcao = combobox.currentText()
-                if opcao in self.opcoes_unicas:
-                    selecionados.add(opcao)
-
-        # Atualiza cada combobox removendo opções já escolhidas
-        for row in range(self.tabela_composicao.rowCount()):
-            combobox = self.tabela_composicao.cellWidget(row, 2)
-            if combobox:
-                opcao_atual = combobox.currentText()
-
-                # 🔴 Desativar o sinal antes de modificar o combobox para evitar loop infinito
-                combobox.blockSignals(True)
-                combobox.clear()
-                combobox.addItem("Nenhum")
-
-                # Adiciona opções únicas apenas se não estiverem selecionadas em outra linha
-                for opcao in self.opcoes_unicas:
-                    if opcao not in selecionados or opcao == opcao_atual:
-                        combobox.addItem(opcao)
-
-                # Adiciona opções repetidas sempre disponíveis
-                for opcao in self.opcoes_repetidas:
-                    combobox.addItem(opcao)
-
-                combobox.setCurrentText(opcao_atual)  # Mantém a opção selecionada
-                
-                # 🟢 Reativar o sinal após modificar o combobox
-                combobox.blockSignals(False)
-
-    def remove_composicao(self):
-        """Remove a linha selecionada"""
-        selected = self.tabela_composicao.currentRow()
-        if selected >= 0:
-            self.tabela_composicao.removeRow(selected)
-
-    def get_data(self):
-        data = []
-        for row in range(self.tabela_composicao.rowCount()):
-            nome_item = self.tabela_composicao.item(row, 0)
-            # parentesco_item = self.tabela_composicao.item(row, 1)
-            vparentesco_widget = self.tabela_composicao.cellWidget(row, 1)  # Obtém o QComboBox
-            parentesco_item = vparentesco_widget.currentText() if vparentesco_widget else ""
-            local_item = self.tabela_composicao.item(row,2)
-            data.append((nome_item.text(), parentesco_item, local_item.text()))
-        return data
-
-    def load_data(self, data):
-        """ Preenche a tabela com os dados passados """
-        for nome, parentesco, local in data:
-            row_count = self.tabela_composicao.rowCount()
-            self.tabela_composicao.insertRow(row_count)
-            self.tabela_composicao.setItem(row_count, 0, QTableWidgetItem(nome))
-            # self.tabela_composicao.setItem(row_count, 1, QTableWidgetItem(parentesco))
-            self.tabela_composicao.setItem(row_count, 2, QTableWidgetItem(local))
-        combobox = QComboBox()
-        combobox.addItems(self.opcoes_unicas + self.opcoes_repetidas)  # Adiciona "Nenhum" como padrão
-        combo.setCurrentText(parentesco)
-        self.tabela_composicao.setCellWidget(row_position, 1, combobox)  
-
 class TableWindow(QDialog):
     def __init__(self, parent=None, data=None):
         super().__init__(parent)
@@ -701,8 +584,8 @@ class MinhaJanela(QMainWindow):
         nomebeneficio=resultado[0][17]
         medicacao=resultado[0][18]
         self.lenomemedicacao.setText(resultado[0][19])
-        self.combo_moradia.setCurrentText=resultado[0][20]
-        self.levalor_aluguel.setText(resultado[0][21])
+        moradia=resultado[0][20]
+        aluguel=resultado[0][21]
         paredes=resultado[0][22]
         telhado=resultado[0][23]
         piso=resultado[0][24]
@@ -727,8 +610,46 @@ class MinhaJanela(QMainWindow):
         elif len(medicacao) == 0:
             self.combo_medicacao.setCurrentIndex(-1)
 
+        self.combo_moradia.setCurrentText(moradia)
+        if moradia != "Alugada":
+            self.levalor_aluguel.setText("")
+            self.lvalor_aluguel.setVisible(False)
+            self.levalor_aluguel.setVisible(False)
+        else:
+            self.levalor_aluguel.setText(aluguel)
+            self.lvalor_aluguel.setVisible(True)
+            self.levalor_aluguel.setVisible(True)
 
+        if paredes not in ["Alvenaria", "Madeira"]:
+            self.combo_paredes.setCurrentText("Outros")
+            self.leparede_outro.setText(paredes)
+            self.lparede_outro.setVisible(True)
+            self.leparede_outro.setVisible(True)
+        else:
+            self.combo_paredes.setCurrentText(paredes)
+            self.lparede_outro.setVisible(False)
+            self.leparede_outro.setVisible(False)
+
+        if telhado not in ["Brasilit","Galvanizada", "Barro"]:
+            self.combo_telhado.setCurrentText("Outros")
+            self.letelhado_outro.setText(telhado)
+            self.ltelhado_outro.setVisible(True)
+            self.letelhado_outro.setVisible(True)
+        else:
+            self.combo_telhado.setCurrentText(paredes)
+            self.ltelhado_outro.setVisible(False)
+            self.letelhado_outro.setVisible(False)
      
+        if piso not in ["Batido","Cerâmica", "Porcelanato"]:
+            self.combo_piso.setCurrentText("Outros")
+            self.lepiso_outro.setText(piso)
+            self.lpiso_outro.setVisible(True)
+            self.lepiso_outro.setVisible(True)
+        else:
+            self.combo_piso.setCurrentText(piso)
+            self.lpiso_outro.setVisible(False)
+            self.lepiso_outro.setVisible(False)            
+
         if id_bairro == None:
             self.combo_zona.setCurrentIndex(-1)
         else:
@@ -1066,6 +987,8 @@ class MinhaJanela(QMainWindow):
             valuguel=""
         else:
             valuguel=self.levalor_aluguel.text().replace(".", "").replace(",", "")
+        print("Valor do alguel...")
+        print(valuguel)   
         vparedes=self.combo_paredes.currentText()
         if vparedes == "Outros":
             vparedes=self.leparede_outro.text()
@@ -1076,6 +999,7 @@ class MinhaJanela(QMainWindow):
         if vpiso == "Outros":
             vpiso=self.lepiso_outro.text()
         vobs=self.data_observacao
+        print(vobs)
         vsql="SELECT N_ID FROM tb_bairro WHERE T_BAIRRO = "+ '"' + vbairro + '"'
         vbairro=[row[0] for row in banco.consultar(vsql)]
         if not self.cpf_valido(vcpf):
@@ -1097,8 +1021,8 @@ class MinhaJanela(QMainWindow):
         elif self.combo_piso.currentText() == "Outros" and len(vpiso) == 0:
             QMessageBox.critical(self, "Erro Crítico","Tipo de Piso deve ser informado!!!", QMessageBox.StandardButton.Ok)            
         else:
-            vsql= "UPDATE tb_pessoa SET T_NOME='"+vnome+"',T_RG='"+vrg+"',T_CPF='"+vcpf+"',T_MAE='"+vmae+"',T_CPFMAE='"+vcpfmae+"',T_PAI='"+vpai+"',T_CPFPAI='"+vcpfpai+"',N_BAIRRO="+str(vbairro[0])+",T_NIS='"+vnis+"',T_FONE='"+vfone+"',T_CEP='"+vcep+"',T_GRAU_ENSINO='"+vgrau_ensino+"',T_ESCOLA='"+vescola+"',T_SERIE_ANO='"+vserieano+"',T_TRABALHA='"+vtrabalha+"',T_RENDA='"+vrenda+"',T_RECBENEFICIO='"+vrecbeneficio+"',T_NOMEBENEFICIO='"+vnomebeneficio+"',T_MEDICACAO='"+vmedicacao+"',T_NOMEMEDICACAO='"+vnomemedicacao+"',T_MORADIA='"+vmoradia+"',T_VALOR_ALUGUEL='"+valuguel+"',T_PAREDES='"+vparedes+"',T_TELHADO='"+vtelhado+"',T_PISO='"+vpiso+"',T_OBS='"+vobs+"' WHERE T_CPF="+vcpf
             print(vsql)
+            vsql= "UPDATE tb_pessoa SET T_NOME='"+vnome+"',T_RG='"+vrg+"',T_CPF='"+vcpf+"',T_MAE='"+vmae+"',T_CPFMAE='"+vcpfmae+"',T_PAI='"+vpai+"',T_CPFPAI='"+vcpfpai+"',N_BAIRRO="+str(vbairro[0])+",T_NIS='"+vnis+"',T_FONE='"+vfone+"',T_CEP='"+vcep+"',T_GRAU_ENSINO='"+vgrau_ensino+"',T_ESCOLA='"+vescola+"',T_SERIE_ANO='"+vserieano+"',T_TRABALHA='"+vtrabalha+"',T_RENDA='"+vrenda+"',T_RECBENEFICIO='"+vrecbeneficio+"',T_NOMEBENEFICIO='"+vnomebeneficio+"',T_MEDICACAO='"+vmedicacao+"',T_NOMEMEDICACAO='"+vnomemedicacao+"',T_MORADIA='"+vmoradia+"',T_VALOR_ALUGUEL='"+valuguel+"',T_PAREDES='"+vparedes+"',T_TELHADO='"+vtelhado+"',T_PISO='"+vpiso+"',T_OBS='"+vobs+"' WHERE T_CPF="+vcpf
             banco.atualizar(vsql)
             self.gravar_composicao()
             self.consultar()
