@@ -122,7 +122,6 @@ class TableWindow_nova(QDialog):
         combo.setCurrentText(parentesco)
         self.tabela_composicao.setCellWidget(row_position, 1, combobox)  
 
-
 class TableWindow(QDialog):
     def __init__(self, parent=None, data=None):
         super().__init__(parent)
@@ -703,11 +702,12 @@ class MinhaJanela(QMainWindow):
         medicacao=resultado[0][18]
         self.lenomemedicacao.setText(resultado[0][19])
         self.combo_moradia.setCurrentText=resultado[0][20]
-        self.levalor_aluguel=resultado[0][21]
+        self.levalor_aluguel.setText(resultado[0][21])
         paredes=resultado[0][22]
         telhado=resultado[0][23]
         piso=resultado[0][24]
         self.data_observacao=resultado[0][25]
+        
         self.combo_medicacao.setCurrentText(medicacao)
         if len(nomebeneficio) != 0:
             if nomebeneficio in ["BPC","Bolsa Família", "Aponsentadoria"]:
@@ -728,6 +728,7 @@ class MinhaJanela(QMainWindow):
             self.combo_medicacao.setCurrentIndex(-1)
 
 
+     
         if id_bairro == None:
             self.combo_zona.setCurrentIndex(-1)
         else:
@@ -960,7 +961,7 @@ class MinhaJanela(QMainWindow):
         if vmoradia != "Alugada":
             valuguel=""
         else:
-            valuguel=self.levalor_aluguel.text()
+            valuguel=self.levalor_aluguel.text().replace(".", "").replace(",", "")
         vparedes=self.combo_paredes.currentText()
         if vparedes == "Outros":
             vparedes=self.leparede_outro.text()
@@ -1064,7 +1065,7 @@ class MinhaJanela(QMainWindow):
         if vmoradia != "Alugada":
             valuguel=""
         else:
-            valuguel=self.levalor_aluguel.text()
+            valuguel=self.levalor_aluguel.text().replace(".", "").replace(",", "")
         vparedes=self.combo_paredes.currentText()
         if vparedes == "Outros":
             vparedes=self.leparede_outro.text()
