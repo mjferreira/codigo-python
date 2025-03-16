@@ -11,46 +11,37 @@ from reportlab.lib import colors
 class PDFGenerator:
     def __init__(self, filename):
         self.filename = filename
+        self.largura_pagina, self.altura_pagina = A4
 
     def mp(self, mm):
         return mm/0.352777
 
     def centralizar_texto(self, pdf, texto, y, fonte="Helvetica-Bold", tamanho=16):
         """ Centraliza um texto horizontalmente no PDF """
-        largura_pagina, altura_pagina = A4
         pdf.setFont(fonte, tamanho)
 
         # Calcula a posição X centralizada
         largura_texto = pdf.stringWidth(texto, fonte, tamanho)
-        x = (largura_pagina - largura_texto) / 2
+        x = (self.largura_pagina - largura_texto) / 2
 
         # Desenha o texto na posição centralizada
         pdf.drawString(x, y, texto)
 
-
     def create_pdf(self):
         c = canvas.Canvas(self.filename, pagesize=A4)
-        
-        # Definindo a largura da folha e a altura do retângulo
         #Largura: 210 mm (milímetros) ou aproximadamente 8,27 polegadas.
         #Altura: 297 mm (milímetros) ou aproximadamente 11,69 polegadas.
-
-        width, height = A4
-        rectangle_height = 1 * 28.35  # Convertendo cm para pontos (1 cm = 28.35 pontos)
-        # Definindo a posição do retângulo
-        x = self.mp(20)  # Início na borda esquerda
-        y = self.mp(250)  # No topo da página
-        print("Y= ", y)
-
+        altura_coluna = 1 * 28.35  # Convertendo cm para pontos (1 cm = 28.35 pontos)
+        
         # Desenhando o retângulo
         c.setFillColor(colors.lightblue)  # Cor de fundo cinza claro
-        c.rect(x, y, width-(2*x), rectangle_height, fill=1)  # Preencher o retângulo
+        c.rect(self.mp(20), self.altura_pagina-self.mp(30), self.largura_pagina-(2*self.mp(20)), altura_coluna, fill=1)  # Preencher o retângulo
 
         # Título
         c.setFillColor(colors.black)  # Cor de fundo cinza claro
-        c.setFont("Helvetica-Bold", 14)
+        c.setFont("Helvetica-Bold", 14)\
         # Centraliza um título na parte superior
-        self.centralizar_texto(c, "FICHA DE INSCRIÇÃO", self.mp(253), tamanho=16)
+        self.centralizar_texto(c, "FICHA DE INSCRIÇÃO", self.altura_pagina-self.mp(25), tamanho=16)
 
         # Adicionar marca d'água
         c.saveState()
@@ -61,9 +52,7 @@ class PDFGenerator:
 
         # Definindo as coordenadas da borda
         x1, y1 = self.mp(20), self.mp(20)  # Ponto inferior esquerdo
-        print(width)
-        print(height)
-        x2, y2 = width-x1, height-y1  # Ponto superior direito
+        x2, y2 = self.largura_pagina-x1, self.altura_pagina-y1  # Ponto superior direito
         
         # Desenhar a borda externa (linha dupla)
         c.setStrokeColorRGB(0, 0, 0)  # Cor da linha (preto)

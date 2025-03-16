@@ -1,53 +1,46 @@
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
-from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 
-def criar_relatorio():
-    """Cria um relatório PDF formatado"""
-    
-    nome_pdf = "relatorio.pdf"
-    pdf = canvas.Canvas(nome_pdf, pagesize=A4)
-    pdf.setTitle("Relatório de Usuários")
+def criar_pdf():
+    """Cria um PDF com exemplos de bordas em tabelas"""
+    nome_pdf = "tabela_bordas.pdf"
+    doc = SimpleDocTemplate(nome_pdf, pagesize=A4)
+    elementos = []
 
-    # Definir fontes e título
-    pdf.setFont("Helvetica-Bold", 18)
-    pdf.drawString(200, 800, "Relatório de Usuários")
-
-    # Linha divisória
-    pdf.setStrokeColor(colors.black)
-    pdf.line(50, 790, 550, 790)
-
-    # Dados fictícios
-    usuarios = [
-        {"id": 1, "nome": "Carlos Silva", "idade": 30, "email": "carlos@email.com"},
-        {"id": 2, "nome": "Ana Souza", "idade": 25, "email": "ana@email.com"},
-        {"id": 3, "nome": "Marcos Lima", "idade": 40, "email": "marcos@email.com"},
+    # Dados da tabela
+    dados = [
+        ["Tipo de Borda", "Exemplo"],
+        ["Sem borda", "Texto 1"],
+        ["Borda sólida", "Texto 2"],
+        ["Apenas borda externa", "Texto 3"],
+        ["Borda personalizada", "Texto 4"],
     ]
 
-    # Cabeçalhos
-    pdf.setFont("Helvetica-Bold", 12)
-    pdf.drawString(50, 750, "ID")
-    pdf.drawString(100, 750, "Nome")
-    pdf.drawString(250, 750, "Idade")
-    pdf.drawString(300, 750, "Email")
+    # Criar tabela base
+    tabela = Table(dados, colWidths=[200, 200])
 
-    # Linha divisória
-    pdf.line(50, 740, 550, 740)
+    # Estilos de borda
+    estilo = TableStyle([
+        ("FONT", (0, 0), (-1, 0), "Helvetica-Bold"),  # Negrito no cabeçalho
+        ("BACKGROUND", (0, 0), (-1, 0), colors.grey),  # Fundo do cabeçalho
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),  # Cor do texto do cabeçalho
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),  # Centralizar texto
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),  # Alinhar verticalmente
+        ("GRID", (0, 1), (-1, 1), 0, colors.white),  # Sem borda (linha 1)
+        ("GRID", (0, 2), (-1, 2), 1, colors.black),  # Borda sólida (linha 2)
+        ("BOX", (0, 3), (-1, 3), 2, colors.red),  # Apenas borda externa (linha 3)
+        ("INNERGRID", (0, 4), (-1, 4), 1, colors.blue),  # Linhas internas em azul (linha 4)
+        ("BOX", (0, 4), (-1, 4), 2, colors.green),  # Borda externa em verde (linha 4)
+    ])
 
-    # Adicionar os dados na tabela
-    pdf.setFont("Helvetica", 12)
-    y = 720
-    for usuario in usuarios:
-        pdf.drawString(50, y, str(usuario["id"]))
-        pdf.drawString(100, y, usuario["nome"])
-        pdf.drawString(250, y, str(usuario["idade"]))
-        pdf.drawString(300, y, usuario["email"])
-        y -= 20  # Pular linha
+    tabela.setStyle(estilo)
+    elementos.append(tabela)
 
-    # Salvar o PDF
-    pdf.save()
-    print(f"Relatório gerado: {nome_pdf}")
+    # Criar o PDF
+    doc.build(elementos)
+    print(f"PDF '{nome_pdf}' gerado com sucesso!")
 
-# Executar a função
-criar_relatorio()
+# Gerar o PDF com bordas
+criar_pdf()

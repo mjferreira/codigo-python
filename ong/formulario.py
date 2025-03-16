@@ -1057,8 +1057,15 @@ class MinhaJanela(QMainWindow):
     def mostrar_mensagem_sobre(self):
         mensagem = QMessageBox(self)
         mensagem.setWindowTitle("Sobre")
-        with open(".sobre", "r", encoding="utf-8") as arquivo:
-            conteudo = arquivo.read()
+        try:
+            with open(".sobre", "r", encoding="utf-8") as arquivo:
+                conteudo = arquivo.read()
+        except FileNotFoundError:
+            conteudo="Erro: O arquivo de configuração do sobre não foi encontrado."
+        except PermissionError:
+            conteudo="Erro: Sem permissão para abrir o arquivo de configuraçã do sobre."
+        except Exception as e:
+            conteudo="Erro inesperado"           
         mensagem.setText(conteudo)
         mensagem.setIcon(QMessageBox.Icon.Information)
         mensagem.setStandardButtons(QMessageBox.StandardButton.Ok)
