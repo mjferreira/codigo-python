@@ -1,48 +1,53 @@
-import sys
-from PyQt6.QtWidgets import QApplication, QWidget, QPushButton, QLabel, QLineEdit
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.lib.units import inch
 
-def funcao1():
-    label.setText("Botao 1 pressionado")
-    label.adjustSize()
+def criar_relatorio():
+    """Cria um relatório PDF formatado"""
+    
+    nome_pdf = "relatorio.pdf"
+    pdf = canvas.Canvas(nome_pdf, pagesize=A4)
+    pdf.setTitle("Relatório de Usuários")
 
-def funcao2():
-    label.setText("Botao 2 pressionado")
-    label.adjustSize()
+    # Definir fontes e título
+    pdf.setFont("Helvetica-Bold", 18)
+    pdf.drawString(200, 800, "Relatório de Usuários")
 
-def funcao3():
-    valor_lido = le.text()
-    label.setText(valor_lido)
-    label.adjustSize()
+    # Linha divisória
+    pdf.setStrokeColor(colors.black)
+    pdf.line(50, 790, 550, 790)
 
-app = QApplication(sys.argv)
+    # Dados fictícios
+    usuarios = [
+        {"id": 1, "nome": "Carlos Silva", "idade": 30, "email": "carlos@email.com"},
+        {"id": 2, "nome": "Ana Souza", "idade": 25, "email": "ana@email.com"},
+        {"id": 3, "nome": "Marcos Lima", "idade": 40, "email": "marcos@email.com"},
+    ]
 
-janela = QWidget()
-janela.resize(800,600)
-janela.setWindowTitle("Ong Amazonia Vivia")
+    # Cabeçalhos
+    pdf.setFont("Helvetica-Bold", 12)
+    pdf.drawString(50, 750, "ID")
+    pdf.drawString(100, 750, "Nome")
+    pdf.drawString(250, 750, "Idade")
+    pdf.drawString(300, 750, "Email")
 
-botao1 = QPushButton("Botao 1",janela)
-botao1.setGeometry(100,100,150,80)
-botao1.setStyleSheet('background-color:red;color:white')
-botao1.clicked.connect(funcao1)
+    # Linha divisória
+    pdf.line(50, 740, 550, 740)
 
-botao2 = QPushButton("Botao 2",janela)
-botao2.setGeometry(100,300,150,80)
-botao2.setStyleSheet('background-color:green;color:white')
-botao2.clicked.connect(funcao2)
+    # Adicionar os dados na tabela
+    pdf.setFont("Helvetica", 12)
+    y = 720
+    for usuario in usuarios:
+        pdf.drawString(50, y, str(usuario["id"]))
+        pdf.drawString(100, y, usuario["nome"])
+        pdf.drawString(250, y, str(usuario["idade"]))
+        pdf.drawString(300, y, usuario["email"])
+        y -= 20  # Pular linha
 
-botao3 = QPushButton("Botao 3",janela)
-botao3.setGeometry(100,500,150,80)
-botao3.setStyleSheet('background-color:blue;color:white')
-botao3.clicked.connect(funcao3)
+    # Salvar o PDF
+    pdf.save()
+    print(f"Relatório gerado: {nome_pdf}")
 
-
-le = QLineEdit("",janela)
-le.setGeometry(500,300,150,40)
-
-
-label = QLabel("Text teste",janela)
-label.move(400,100)
-label.setStyleSheet('font-size:30px')
-janela.show()
-
-app.exec()
+# Executar a função
+criar_relatorio()

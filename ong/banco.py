@@ -4,6 +4,7 @@ import os
 
 pastaApp=os.path.dirname(__file__)
 caminho=pastaApp+"/ong.db"
+
 ########## Criar Conexão
 def ConexaoBanco():
 #    caminho="/home/marcelo/programacao/codigo-python/ong/ong.db"

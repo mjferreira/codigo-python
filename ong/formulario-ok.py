@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import QTableWidgetItem, QComboBox, QSizePolicy, QDialog, Q
 from PyQt6.QtGui import QAction, QIcon, QTextCursor
 from PyQt6.QtCore import QSize
 import banco
+import observacao
 
 class TableWindow(QDialog):
     def __init__(self, parent=None, data=None):
@@ -80,44 +81,6 @@ class TableWindow(QDialog):
             combo.addItems(["Esposo(a)","Pai", "Mãe", "Filho(a)", "Avô(ó)","Sobrinho(a)","Enteado(a)","Tio(a)"])
             combo.setCurrentText(parentesco)
             self.tabela_composicao.setCellWidget(row_count, 1, combo)
-
-class ObservacaoWindow(QDialog):
-    def __init__(self, parent=None, texto_atual=""):
-        super().__init__(parent)
-        self.setWindowTitle("Observação")
-        self.resize(400, 200)
-        
-        self.text_edit = QTextEdit()
-        self.text_edit.setPlainText(texto_atual)
-        self.text_edit.setPlaceholderText("Digite sua observação aqui...")
-
-        self.btn_ok = QPushButton("OK")
-        self.btn_ok.clicked.connect(self.accept)
-
-        layout = QVBoxLayout()
-        layout.addWidget(self.text_edit)
-        layout.addWidget(self.btn_ok)
-        self.setLayout(layout)
-
-        # Conecta a função ao evento de mudança de texto
-        self.text_edit.textChanged.connect(self.limitar_texto)
-
-    def get_text(self):
-        """ Retorna o texto digitado, já limitado a 400 caracteres """
-        return self.text_edit.toPlainText()[:400]
-
-    def limitar_texto(self):
-        """ Impede que o usuário digite mais de 400 caracteres """
-        texto = self.text_edit.toPlainText()
-        if len(texto) > 400:
-            # Trunca o texto para 400 caracteres
-            self.text_edit.blockSignals(True)  # Evita loop infinito de eventos
-            self.text_edit.setPlainText(texto[:400])
-            self.text_edit.blockSignals(False)
-
-            # Move o cursor para o final do texto
-            self.text_edit.moveCursor(QTextCursor.MoveOperation.End)
-
 class MinhaJanela(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -125,11 +88,9 @@ class MinhaJanela(QMainWindow):
         self.setGeometry(500, 100, 720, 850)
         self.setWindowTitle("Ong Amazonia Vivia")
         self.setStyleSheet("background-color: lightblue; color: black;")
-
         # Criando um widget central
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
-
         # Criar a barra de menuInserir
         menu_bar = self.menuBar()
         menu_bar.setStyleSheet("background-color: lightgray; color: black;")
@@ -155,6 +116,10 @@ class MinhaJanela(QMainWindow):
         acao_mostrar.triggered.connect(self.mostrar_mensagem_sobre)
         # Adicionar ações ao menu
         menu_sobre.addAction(acao_mostrar)
+        self.denfir_formulario()
+        self.definir_tabela_consulta()
+        self.ocultar_itens()
+    def denfir_formulario(self):
         self.botao1 = QPushButton("Gravar", self.central_widget)
         self.botao1.setFixedSize(80, 30)
         self.botao1.move(630,780)
@@ -506,7 +471,7 @@ class MinhaJanela(QMainWindow):
         self.btn_observacao = QPushButton("Observações - Profissional Entrevistador",self.central_widget)
         self.btn_observacao.setGeometry(10,linha,700,20)
         self.btn_observacao.clicked.connect(self.abrir_observacao)
-
+    def definir_tabela_consulta(self):
         # Layout principale
         layout = QVBoxLayout(self.central_widget)
         # Campo de busca
@@ -525,8 +490,6 @@ class MinhaJanela(QMainWindow):
         self.botao_toggle.setFixedSize(80, 30)
         layout.addWidget(self.botao_toggle)
         # self.tabela.setStyleSheet("QTableWidget { background-color: lightblue; color: black; }")  # Define a cor do texto para azul
-        self.ocultar_itens()
-
     def carregar_tabela_consulta(self):
         vsql = "SELECT T_NOME, T_CPF, T_NIS FROM tb_pessoa order by T_NOME"
         dados = banco.consultar(vsql)
@@ -1168,13 +1131,9 @@ class MinhaJanela(QMainWindow):
     def mostrar_mensagem_sobre(self):
         mensagem = QMessageBox(self)
         mensagem.setWindowTitle("Sobre")
-        # mensagem.setStyleSheet('background: lightgray; color: black; font-size:18px;')
-        mensagem.setText("""
-Controle de Formulários
-ONG Amazonia Viva
-Versão: 1.0.0
-Autor: Marcelo Ferreira
-            """)
+        with open(".sobre", "r", encoding="utf-8") as arquivo:
+            conteudo = arquivo.read()
+        mensagem.setText(conteudo)
         mensagem.setIcon(QMessageBox.Icon.Information)
         mensagem.setStandardButtons(QMessageBox.StandardButton.Ok)
         mensagem.exec()
@@ -1184,9 +1143,9 @@ Autor: Marcelo Ferreira
             self.data_composicao = composicao.get_data()  # Atualiza os dados
             print(self.data_composicao)
     def abrir_observacao(self):
-        observacao = ObservacaoWindow(self, self.data_observacao)  # Passa os dados existentes
-        if observacao.exec():
-            self.data_observacao = observacao.get_text()  # Atualiza os dados
+        obs1 = observacao.ObservacaoWindow(self, self.data_observacao)  # Passa os dados existentes
+        if obs1.exec():
+            self.data_observacao = obs1.get_text()  # Atualiza os dados
             print(self.data_observacao)
     def gravar_composicao(self):
         """Salva os dados da tabela no banco de dados"""
