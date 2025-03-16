@@ -1,5 +1,6 @@
-import sys
+import sys, os
 import subprocess
+import configparser
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget
 )
@@ -8,6 +9,19 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
 from reportlab.lib import colors
 
+caminho_pdf = "/home/marcelo/Downloads/"
+pastaApp=os.path.dirname(__file__)
+# Criar um objeto ConfigParser
+config = configparser.ConfigParser()
+# Ler o arquivo de configuração
+config.read('config.ini')
+nome_fantasia = config['configuracao']['nome_fantasia']
+empresa = config['configuracao']['empresa']
+end_empresa = config['configuracao']['end_empresa']
+cnpj_empresa = config['configuracao']['cnpj_empresa']
+email_empresa = config['configuracao']['email_empresa']
+fone_empresa = config['configuracao']['fone_empresa']
+
 class PDFGenerator:
     def __init__(self, filename):
         self.filename = filename
@@ -15,6 +29,81 @@ class PDFGenerator:
 
     def mp(self, mm):
         return mm/0.352777
+
+    def cabecalho(self, pdf):
+        pdf.drawImage(pastaApp+"/logo.png",self.mp(101), self.altura_pagina-self.mp(11),self.mp(8),self.mp(8))
+        self.centralizar_texto(pdf, nome_fantasia, self.altura_pagina-self.mp(15), tamanho=8)   
+
+    def corpo(self, pdf):
+       # Definindo as coordenadas da borda
+        x1, y1 = self.mp(20), self.mp(20)  # Ponto inferior esquerdo
+        x2, y2 = self.largura_pagina-x1, self.altura_pagina-y1  # Ponto superior direito
+        # Desenhar a borda externa (linha dupla)
+        pdf.setStrokeColorRGB(0, 0, 0)  # Cor da linha (preto)
+        pdf.setLineWidth(1)  # Largura da linha
+        pdf.rect(x1, y1, x2 - x1, y2 - y1, stroke=1, fill=0)  # Retângulo externo
+        #Largura: 210 mm (milímetros) ou aproximadamente 8,27 polegadas.
+        #Altura: 297 mm (milímetros) ou aproximadamente 11,69 polegadas.
+        altura_coluna = 0.8 * 28.35  # Convertendo cm para pontos (1 cm = 28.35 pontos)
+        
+        pdf.setLineWidth(1)  # Largura da linha
+        linha=25
+        # Desenhando o retângulo
+        pdf.setFillColor(colors.lightgrey)  # Cor de fundo cinza claro
+        pdf.rect(self.mp(20), self.altura_pagina-self.mp(linha), self.largura_pagina-(2*self.mp(20)), altura_coluna, fill=1)  # Preencher o retângulo
+        pdf.setFillColor(colors.black) 
+        self.centralizar_texto(pdf, "FICHA DE INSCRIÇÃO", self.altura_pagina-self.mp(linha-2), tamanho=12)
+
+        linha+=8
+        pdf.setFillColor(colors.white)  
+        pdf.rect(self.mp(20), self.altura_pagina-self.mp(linha), self.largura_pagina-(2*self.mp(20)), altura_coluna, fill=1)  # Preencher o retângulo
+        pdf.setFillColor(colors.black) 
+        pdf.setFont("Helvetica", 10)
+        pdf.drawString(self.mp(22), self.altura_pagina-self.mp(linha-1), "Data de Requerimento:")
+
+        linha+=8
+        pdf.setFillColor(colors.lightgrey)  # Cor de fundo cinza claro
+        pdf.rect(self.mp(20), self.altura_pagina-self.mp(linha), self.largura_pagina-(2*self.mp(20)), altura_coluna, fill=1)  # Preencher o retângulo
+        pdf.setFillColor(colors.black)  # Cor de fundo cinza claro
+        self.centralizar_texto(pdf, "IDENTIFICAÇÃO", self.altura_pagina-self.mp(linha-2), tamanho=12)  
+
+        linha+=8
+        pdf.setFillColor(colors.white)  
+        pdf.rect(self.mp(20), self.altura_pagina-self.mp(linha), self.largura_pagina-(2*self.mp(20)), altura_coluna, fill=1)  # Preencher o retângulo
+        pdf.setFillColor(colors.black) 
+        pdf.setFont("Helvetica", 10)
+        pdf.drawString(self.mp(22), self.altura_pagina-self.mp(linha-1), "NOME:")
+
+        linha+=8
+        pdf.setFillColor(colors.white)  
+        pdf.rect(self.mp(20), self.altura_pagina-self.mp(linha), self.mp(55), altura_coluna, fill=1)  # Preencher o retângulo
+        pdf.setFillColor(colors.black) 
+        pdf.setFont("Helvetica", 10)
+        pdf.drawString(self.mp(22), self.altura_pagina-self.mp(linha-1), "RG:")
+
+        pdf.setFillColor(colors.white)  
+        pdf.rect(self.mp(75), self.altura_pagina-self.mp(linha), self.mp(55), altura_coluna, fill=1)  # Preencher o retângulo
+        pdf.setFillColor(colors.black) 
+        pdf.setFont("Helvetica", 10)
+        pdf.drawString(self.mp(77), self.altura_pagina-self.mp(linha-1), "CPF:")
+
+        pdf.setFillColor(colors.white)  
+        pdf.rect(self.mp(130), self.altura_pagina-self.mp(linha), self.mp(60), altura_coluna, fill=1)  # Preencher o retângulo
+        pdf.setFillColor(colors.black) 
+        pdf.setFont("Helvetica", 10)
+        pdf.drawString(self.mp(132), self.altura_pagina-self.mp(linha-1), "FONE:")       
+
+
+        # Linhas de preenchimento
+        # cpdf.setFont("Helvetica", 12)
+        # pdf.drawString(50, 700, "NOME:")
+        # pdf.line(100, 698, 500, 698)  # Linha para preenchimento
+
+
+    def rodape(self, pdf):
+        self.centralizar_texto(pdf, empresa+" - CNPJ:"+cnpj_empresa, self.mp(15), tamanho=8)   
+        self.centralizar_texto(pdf, end_empresa, self.mp(10), tamanho=8)  
+        self.centralizar_texto(pdf, "Telefone: "+fone_empresa+" E-mail:"+email_empresa, self.mp(5), tamanho=8) 
 
     def centralizar_texto(self, pdf, texto, y, fonte="Helvetica-Bold", tamanho=16):
         """ Centraliza um texto horizontalmente no PDF """
@@ -29,69 +118,9 @@ class PDFGenerator:
 
     def create_pdf(self):
         c = canvas.Canvas(self.filename, pagesize=A4)
-        #Largura: 210 mm (milímetros) ou aproximadamente 8,27 polegadas.
-        #Altura: 297 mm (milímetros) ou aproximadamente 11,69 polegadas.
-        altura_coluna = 1 * 28.35  # Convertendo cm para pontos (1 cm = 28.35 pontos)
-        
-        # Desenhando o retângulo
-        c.setFillColor(colors.lightblue)  # Cor de fundo cinza claro
-        c.rect(self.mp(20), self.altura_pagina-self.mp(30), self.largura_pagina-(2*self.mp(20)), altura_coluna, fill=1)  # Preencher o retângulo
-
-        # Título
-        c.setFillColor(colors.black)  # Cor de fundo cinza claro
-        c.setFont("Helvetica-Bold", 14)\
-        # Centraliza um título na parte superior
-        self.centralizar_texto(c, "FICHA DE INSCRIÇÃO", self.altura_pagina-self.mp(25), tamanho=16)
-
-        # Adicionar marca d'água
-        c.saveState()
-        c.setFont("Helvetica", 50)
-        c.setFillColorRGB(0.7, 0.7, 0.7)  # Cor cinza
-        c.drawCentredString(4 * inch, 5 * inch, "ONG Amazônia Viva")  # Adicione a marca d'água no centro
-        c.restoreState()
-
-        # Definindo as coordenadas da borda
-        x1, y1 = self.mp(20), self.mp(20)  # Ponto inferior esquerdo
-        x2, y2 = self.largura_pagina-x1, self.altura_pagina-y1  # Ponto superior direito
-        
-        # Desenhar a borda externa (linha dupla)
-        c.setStrokeColorRGB(0, 0, 0)  # Cor da linha (preto)
-        c.setLineWidth(2)  # Largura da linha
-        c.rect(x1, y1, x2 - x1, y2 - y1, stroke=1, fill=0)  # Retângulo externo
-
-
-        
-        # Linhas de preenchimento
-        c.setFont("Helvetica", 12)
-        c.drawString(50, 700, "NOME:")
-        c.line(100, 698, 500, 698)  # Linha para preenchimento
-
-        c.drawString(50, 670, "CPF:")
-        c.line(100, 668, 200, 668)  # Linha para preenchimento
-
-        c.drawString(50, 640, "MATRÍCULA:")
-        c.line(100, 638, 200, 638)  # Linha para preenchimento
-
-        c.drawString(50, 610, "ENDEREÇO:")
-        c.line(100, 608, 500, 608)  # Linha para preenchimento
-
-        c.drawString(50, 580, "CIDADE:")
-        c.line(100, 578, 200, 578)  # Linha para preenchimento
-
-        c.drawString(50, 550, "ESTADO:")
-        c.line(100, 548, 200, 548)  # Linha para preenchimento
-
-        c.drawString(50, 520, "CEP:")
-        c.line(100, 518, 200, 518)  # Linha para preenchimento
-
-        c.drawString(50, 490, "TELEFONE:")
-        c.line(100, 488, 200, 488)  # Linha para preenchimento
-
-        # Instruções adicionais
-        c.setFont("Helvetica", 10)
-        c.drawString(50, 450, "INSTRUÇÕES:")
-        c.drawString(50, 430, "1. Preencha todos os campos.")
-        c.drawString(50, 415, "2. Entregue o formulário na secretaria.")
+        self.cabecalho(c)
+        self.corpo(c)
+        self.rodape(c) 
         c.save()
 
 class App(QMainWindow):
@@ -112,10 +141,9 @@ class App(QMainWindow):
         self.setCentralWidget(container)
 
     def generate_pdf(self):
-        filename = "output.pdf"
+        filename = caminho_pdf+"output.pdf"
         pdf_generator = PDFGenerator(filename)
         pdf_generator.create_pdf()
-
         # Abrir o PDF gerado
         self.open_pdf(filename)
 
