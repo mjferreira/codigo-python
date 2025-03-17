@@ -21,6 +21,8 @@ end_empresa = config['configuracao']['end_empresa']
 cnpj_empresa = config['configuracao']['cnpj_empresa']
 email_empresa = config['configuracao']['email_empresa']
 fone_empresa = config['configuracao']['fone_empresa']
+altura_coluna = 0.8 * 28.35  # Convertendo cm para pontos (1 cm = 28.35 pontos)
+
 
 class PDFGenerator:
     def __init__(self, filename):
@@ -32,7 +34,7 @@ class PDFGenerator:
 
     def cabecalho(self, pdf):
         pdf.drawImage(pastaApp+"/logo.png",self.mp(101), self.altura_pagina-self.mp(11),self.mp(8),self.mp(8))
-        self.centralizar_texto(pdf, nome_fantasia, self.altura_pagina-self.mp(15), tamanho=8)   
+        self.imprimir_texto(pdf, nome_fantasia, self.altura_pagina-self.mp(15), tamanho=8, posicao=0)   
 
     def corpo(self, pdf):
        # Definindo as coordenadas da borda
@@ -44,55 +46,112 @@ class PDFGenerator:
         pdf.rect(x1, y1, x2 - x1, y2 - y1, stroke=1, fill=0)  # Retângulo externo
         #Largura: 210 mm (milímetros) ou aproximadamente 8,27 polegadas.
         #Altura: 297 mm (milímetros) ou aproximadamente 11,69 polegadas.
-        altura_coluna = 0.8 * 28.35  # Convertendo cm para pontos (1 cm = 28.35 pontos)
-        
+   
         pdf.setLineWidth(1)  # Largura da linha
-        linha=25
+        
+        linha=28
+        
+        #self.imprimir_linha_tabela(pdf, "FICHA DE INSCRIÇÃO", self.altura_pagina-self.mp(linha), fonte="Helvetica-Bold", tamanho=12, posicao=0, fundo=colors.lightgrey)
         # Desenhando o retângulo
         pdf.setFillColor(colors.lightgrey)  # Cor de fundo cinza claro
         pdf.rect(self.mp(20), self.altura_pagina-self.mp(linha), self.largura_pagina-(2*self.mp(20)), altura_coluna, fill=1)  # Preencher o retângulo
         pdf.setFillColor(colors.black) 
-        self.centralizar_texto(pdf, "FICHA DE INSCRIÇÃO", self.altura_pagina-self.mp(linha-2), tamanho=12)
-
+        self.imprimir_texto(pdf, "FICHA DE INSCRIÇÃO", self.altura_pagina-self.mp(linha-2), tamanho=12, posicao=0)
+        
         linha+=8
+        # self.imprimir_linha_tabela(pdf, "Data de Requerimento:", self.altura_pagina-self.mp(linha), fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.largura_pagina-(2*self.mp(20)), fundo=colors.white)
         pdf.setFillColor(colors.white)  
         pdf.rect(self.mp(20), self.altura_pagina-self.mp(linha), self.largura_pagina-(2*self.mp(20)), altura_coluna, fill=1)  # Preencher o retângulo
         pdf.setFillColor(colors.black) 
-        pdf.setFont("Helvetica", 10)
-        pdf.drawString(self.mp(22), self.altura_pagina-self.mp(linha-1), "Data de Requerimento:")
-
+        self.imprimir_texto(pdf, "Data de Requerimento:", self.altura_pagina-self.mp(linha-2), fonte="Helvetica", tamanho=10, posicao=self.mp(22))
+            
         linha+=8
         pdf.setFillColor(colors.lightgrey)  # Cor de fundo cinza claro
         pdf.rect(self.mp(20), self.altura_pagina-self.mp(linha), self.largura_pagina-(2*self.mp(20)), altura_coluna, fill=1)  # Preencher o retângulo
         pdf.setFillColor(colors.black)  # Cor de fundo cinza claro
-        self.centralizar_texto(pdf, "IDENTIFICAÇÃO", self.altura_pagina-self.mp(linha-2), tamanho=12)  
-
+        self.imprimir_texto(pdf, "IDENTIFICAÇÃO", self.altura_pagina-self.mp(linha-2), tamanho=12, posicao=0)  
+        # self.imprimir_texto(pdf, "IDENTIFICAÇÃO", self.altura_pagina-self.mp(linha-2), fonte="Helvetica", tamanho=10, posicao=self.mp(22))
+        # self.imprimir_linha_tabela(pdf, "IDENTIFICAÇÃO", self.altura_pagina-self.mp(linha-2), fonte="Helvetica-Bold", tamanho=12, posicao=0, fundo=colors.lightgrey)
+        
         linha+=8
         pdf.setFillColor(colors.white)  
         pdf.rect(self.mp(20), self.altura_pagina-self.mp(linha), self.largura_pagina-(2*self.mp(20)), altura_coluna, fill=1)  # Preencher o retângulo
         pdf.setFillColor(colors.black) 
-        pdf.setFont("Helvetica", 10)
-        pdf.drawString(self.mp(22), self.altura_pagina-self.mp(linha-1), "NOME:")
+        self.imprimir_texto(pdf, "NOME:", self.altura_pagina-self.mp(linha-2), fonte="Helvetica", tamanho=10, posicao=self.mp(22))
 
         linha+=8
         pdf.setFillColor(colors.white)  
         pdf.rect(self.mp(20), self.altura_pagina-self.mp(linha), self.mp(55), altura_coluna, fill=1)  # Preencher o retângulo
         pdf.setFillColor(colors.black) 
-        pdf.setFont("Helvetica", 10)
-        pdf.drawString(self.mp(22), self.altura_pagina-self.mp(linha-1), "RG:")
+        self.imprimir_texto(pdf, "RG:", self.altura_pagina-self.mp(linha-2), fonte="Helvetica", tamanho=10, posicao=self.mp(22))
 
         pdf.setFillColor(colors.white)  
         pdf.rect(self.mp(75), self.altura_pagina-self.mp(linha), self.mp(55), altura_coluna, fill=1)  # Preencher o retângulo
         pdf.setFillColor(colors.black) 
-        pdf.setFont("Helvetica", 10)
-        pdf.drawString(self.mp(77), self.altura_pagina-self.mp(linha-1), "CPF:")
+        self.imprimir_texto(pdf, "CPF:", self.altura_pagina-self.mp(linha-2), fonte="Helvetica", tamanho=10, posicao=self.mp(77))
 
         pdf.setFillColor(colors.white)  
         pdf.rect(self.mp(130), self.altura_pagina-self.mp(linha), self.mp(60), altura_coluna, fill=1)  # Preencher o retângulo
         pdf.setFillColor(colors.black) 
-        pdf.setFont("Helvetica", 10)
-        pdf.drawString(self.mp(132), self.altura_pagina-self.mp(linha-1), "FONE:")       
+        self.imprimir_texto(pdf, "FONE:", self.altura_pagina-self.mp(linha-2), fonte="Helvetica", tamanho=10, posicao=self.mp(132))
 
+        linha+=8
+        pdf.setFillColor(colors.white)  
+        pdf.rect(self.mp(20), self.altura_pagina-self.mp(linha), self.largura_pagina-(2*self.mp(20)), altura_coluna, fill=1)  # Preencher o retângulo
+        pdf.setFillColor(colors.black) 
+        self.imprimir_texto(pdf, "ENDEREÇO:", self.altura_pagina-self.mp(linha-2), fonte="Helvetica", tamanho=10, posicao=self.mp(22))
+        
+        
+        linha+=8
+        pdf.setFillColor(colors.white)  
+        pdf.rect(self.mp(20), self.altura_pagina-self.mp(linha), self.largura_pagina-(2*self.mp(20)), altura_coluna, fill=1)  # Preencher o retângulo
+        pdf.setFillColor(colors.black) 
+        self.imprimir_texto(pdf, "BAIRRO:", self.altura_pagina-self.mp(linha-2), fonte="Helvetica", tamanho=10, posicao=self.mp(22))
+        
+        pdf.setFillColor(colors.white)  
+        pdf.rect(self.mp(130), self.altura_pagina-self.mp(linha), self.mp(60), altura_coluna, fill=1)  # Preencher o retângulo
+        pdf.setFillColor(colors.black) 
+        self.imprimir_texto(pdf, "CEP:", self.altura_pagina-self.mp(linha-2), fonte="Helvetica", tamanho=10, posicao=self.mp(132))
+        
+        linha+=8
+        pdf.setFillColor(colors.white)  
+        pdf.rect(self.mp(20), self.altura_pagina-self.mp(linha), self.largura_pagina-(2*self.mp(20)), altura_coluna, fill=1)  # Preencher o retângulo
+        pdf.setFillColor(colors.black) 
+        self.imprimir_texto(pdf, "MÃE:", self.altura_pagina-self.mp(linha-2), fonte="Helvetica", tamanho=10, posicao=self.mp(22))
+        
+        pdf.setFillColor(colors.white)  
+        pdf.rect(self.mp(130), self.altura_pagina-self.mp(linha), self.mp(60), altura_coluna, fill=1)  # Preencher o retângulo
+        pdf.setFillColor(colors.black) 
+        self.imprimir_texto(pdf, "CPF:", self.altura_pagina-self.mp(linha-2), fonte="Helvetica", tamanho=10, posicao=self.mp(132))   
+        
+        linha+=8
+        pdf.setFillColor(colors.white)  
+        pdf.rect(self.mp(20), self.altura_pagina-self.mp(linha), self.largura_pagina-(2*self.mp(20)), altura_coluna, fill=1)  # Preencher o retângulo
+        pdf.setFillColor(colors.black) 
+        self.imprimir_texto(pdf, "PAI:", self.altura_pagina-self.mp(linha-2), fonte="Helvetica", tamanho=10, posicao=self.mp(22))
+        
+        pdf.setFillColor(colors.white)  
+        pdf.rect(self.mp(130), self.altura_pagina-self.mp(linha), self.mp(60), altura_coluna, fill=1)  # Preencher o retângulo
+        pdf.setFillColor(colors.black) 
+        self.imprimir_texto(pdf, "CPF:", self.altura_pagina-self.mp(linha-2), fonte="Helvetica", tamanho=10, posicao=self.mp(132))
+ 
+        linha+=8
+        pdf.setFillColor(colors.white)  
+        pdf.rect(self.mp(20), self.altura_pagina-self.mp(linha), self.largura_pagina-(2*self.mp(20)), altura_coluna, fill=1)  # Preencher o retângulo
+        pdf.setFillColor(colors.black) 
+        self.imprimir_texto(pdf, "NIS:", self.altura_pagina-self.mp(linha-2), fonte="Helvetica", tamanho=10, posicao=self.mp(22))        
+        
+        linha+=8
+        pdf.setFillColor(colors.lightgrey)  # Cor de fundo cinza claro
+        pdf.rect(self.mp(20), self.altura_pagina-self.mp(linha), self.largura_pagina-(2*self.mp(20)), altura_coluna, fill=1)  # Preencher o retângulo
+        pdf.setFillColor(colors.black)  # Cor de fundo cinza claro
+        self.imprimir_texto(pdf, "ESCOLARIDADE", self.altura_pagina-self.mp(linha-2), tamanho=12, posicao=0)  
+        
+        linha+=8
+        pdf.setFillColor(colors.white)  
+        pdf.rect(self.mp(20), self.altura_pagina-self.mp(linha), self.largura_pagina-(2*self.mp(20)), altura_coluna, fill=1)  # Preencher o retângulo
+        pdf.setFillColor(colors.black) 
+        self.imprimir_texto(pdf, "GRAU DE ENSINO: (  ) ANALFABELTO   (  ) ENS. FUNDA  (  ) ENS. MÉDIO  (  ) ENS. SUPERIOR", self.altura_pagina-self.mp(linha-2), fonte="Helvetica", tamanho=10, posicao=self.mp(22))  
 
         # Linhas de preenchimento
         # cpdf.setFont("Helvetica", 12)
@@ -101,18 +160,38 @@ class PDFGenerator:
 
 
     def rodape(self, pdf):
-        self.centralizar_texto(pdf, empresa+" - CNPJ:"+cnpj_empresa, self.mp(15), tamanho=8)   
-        self.centralizar_texto(pdf, end_empresa, self.mp(10), tamanho=8)  
-        self.centralizar_texto(pdf, "Telefone: "+fone_empresa+" E-mail:"+email_empresa, self.mp(5), tamanho=8) 
+        self.imprimir_texto(pdf, empresa+" - CNPJ:"+cnpj_empresa, self.mp(15), tamanho=8, posicao=0)   
+        self.imprimir_texto(pdf, end_empresa, self.mp(10), tamanho=8, posicao=0)  
+        self.imprimir_texto(pdf, "Telefone: "+fone_empresa+" E-mail:"+email_empresa, self.mp(5), tamanho=8, posicao=0) 
 
-    def centralizar_texto(self, pdf, texto, y, fonte="Helvetica-Bold", tamanho=16):
+    def imprimir_linha_tabela(self, pdf, texto, y, fonte="Helvetica-Bold", tamanho=16, posicao=0, largura_coluna=0, fundo=colors.white):
         """ Centraliza um texto horizontalmente no PDF """
-        pdf.setFont(fonte, tamanho)
-
-        # Calcula a posição X centralizada
-        largura_texto = pdf.stringWidth(texto, fonte, tamanho)
-        x = (self.largura_pagina - largura_texto) / 2
-
+        pdf.setFillColor(fundo)          
+        if posicao == 0:
+            # Calcula a posição X centralizada
+            largura_texto = pdf.stringWidth(texto, fonte, tamanho)
+            largura_coluna = self.largura_pagina-(2*self.mp(20))
+            x = (self.largura_pagina - largura_texto) / 2
+            posicao = self.mp(20)
+        else:
+            x = posicao+2
+        
+        pdf.rect(posicao, y, largura_coluna, altura_coluna, fill=1)  # Preencher o retângulo                                               
+        pdf.setFillColor(colors.black) 
+        pdf.setFont(fonte, tamanho)   
+        # Desenha o texto na posição centralizada
+        pdf.drawString(x, y, texto)       
+       
+    def imprimir_texto(self, pdf, texto, y, fonte="Helvetica-Bold", tamanho=16, posicao=0):
+        """ Centraliza um texto horizontalmente no PDF """      
+        if posicao == 0:
+            # Calcula a posição X centralizada
+            largura_texto = pdf.stringWidth(texto, fonte, tamanho)
+            x = (self.largura_pagina - largura_texto) / 2
+        else:
+            x = posicao
+        
+        pdf.setFont(fonte, tamanho)   
         # Desenha o texto na posição centralizada
         pdf.drawString(x, y, texto)
 
