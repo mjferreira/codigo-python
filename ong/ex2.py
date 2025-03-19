@@ -1,29 +1,26 @@
-from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 
-def create_pdf_with_table(filename):
-    c = canvas.Canvas(filename, pagesize=A4)
+def criar_pdf_com_linhas():
+    nome_pdf = "linhas_exemplo.pdf"
+    pdf = canvas.Canvas(nome_pdf)
 
-    # Definir as dimensões da tabela
-    x = 100  # Posição x da tabela
-    y = 700  # Posição y da tabela
-    col_width = 150  # Largura de cada coluna
-    row_height = 30   # Altura de cada linha
+    # Linha horizontal
+    pdf.line(50, 750, 550, 750)
 
-    # Desenhar cabeçalho da tabela
-    headers = ["Coluna 1", "Coluna 2", "Coluna 3"]
-    for i in range(len(headers)):
-        c.rect(x + i * col_width, y, col_width, row_height)  # Moldura da célula
-        c.drawString(x + i * col_width + 10, y + 7, headers[i])  # Texto do cabeçalho
+    # Linha vertical
+    pdf.line(300, 700, 300, 500)  # De (300,700) até (300,500)
 
-    # Desenhar uma linha de dados
-    data = ["Dado 1", "Dado 2", "Dado 3"]
-    for i in range(len(data)):
-        c.rect(x + i * col_width, y - row_height, col_width, row_height)  # Moldura da célula
-        c.drawString(x + i * col_width + 10, y - row_height + 7, data[i])  # Texto da célula
+    # Linha diagonal
+    pdf.line(100, 400, 500, 200)  # De (100,400) até (500,200)
 
-    # Finalizar o PDF
-    c.save()
+    # Adicionando textos explicativos
+    pdf.drawString(50, 760, "Linha Horizontal")
+    pdf.drawString(310, 710, "Linha Vertical")
+    pdf.drawString(150, 410, "Linha Diagonal")
 
-if __name__ == "__main__":
-    create_pdf_with_table("table_with_borders.pdf")
+    # Salvar PDF
+    pdf.save()
+    print(f"PDF '{nome_pdf}' gerado com sucesso!")
+
+# Criar PDF com diferentes tipos de linhas
+criar_pdf_com_linhas()

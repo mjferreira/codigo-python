@@ -33,10 +33,10 @@ class PDFGenerator:
         return mm/0.352777
 
     def cabecalho(self, pdf):
-        pdf.drawImage(pastaApp+"/logo.png",self.mp(101), self.altura_pagina-self.mp(11),self.mp(8),self.mp(8))
-        self.imprimir_texto(pdf, nome_fantasia, self.altura_pagina-self.mp(15), tamanho=8, posicao=0)   
+        pdf.drawImage(pastaApp+"/logo.png",self.mp(100), self.altura_pagina-self.mp(15),self.mp(10),self.mp(10))
+        self.imprimir_texto(pdf, nome_fantasia, self.altura_pagina-self.mp(20), tamanho=8, posicao=0)   
 
-    def corpo(self, pdf):
+    def pagina1(self, pdf):
        # Definindo as coordenadas da borda
         x1, y1 = self.mp(20), self.mp(30)  # Ponto inferior esquerdo
         x2, y2 = self.largura_pagina-x1, self.altura_pagina-y1  # Ponto superior direito
@@ -49,7 +49,7 @@ class PDFGenerator:
    
         pdf.setLineWidth(1)  # Largura da linha
         
-        linha=20+incremento      
+        linha=30+incremento      
         self.imprimir_linha_tabela(pdf, "FICHA DE INSCRIÇÃO", linha, fonte="Helvetica-Bold", tamanho=12, posicao=0, fundo=colors.lightgrey)
         # Desenhando o retângulo
         # pdf.setFillColor(colors.lightgrey)  # Cor de fundo cinza claro
@@ -159,23 +159,35 @@ class PDFGenerator:
         linha+=incremento
         self.imprimir_linha_tabela(pdf, "CASA: (  )PRÓPRIA  (  )ALUGADA  (  )CEDIDA", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
 
-        linha+=incremento
-        self.imprimir_linha_tabela(pdf, "SE ALUGUEL, QUANTO: R$", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+    def pagina2(self,pdf):
+        x1, y1 = self.mp(20), self.mp(141)  # Ponto inferior esquerdo
+        x2, y2 = self.largura_pagina-x1, self.altura_pagina-self.mp(30) # Ponto superior direito
+        # Desenhar a borda externa (linha dupla)
+        pdf.setStrokeColorRGB(0, 0, 0)  # Cor da linha (preto)
+        pdf.setLineWidth(1)  # Largura da linha
+        pdf.rect(x1, y1, x2 - x1, y2 - y1, stroke=1, fill=0)  # Retângulo externo
 
-        #ltura_coluna = 0.7 * 28.35  # Convertendo cm para pontos (1 cm = 28.35 pontos)
-        #ncremento = 7
+        linha=30+incremento
+        self.imprimir_linha_tabela(pdf, "SE ALUGUEL, QUANTO: R$", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
         
         linha+=incremento
-        self.imprimir_linha_tabela(pdf, "PAREDES: (  )ALVENÁRIA  (  )MADEIRA      OUTROS:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+        self.imprimir_linha_tabela(pdf, "PAREDES: (  )ALVENÁRIA  (  )MADEIRA                   OUTROS:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
 
-       #linha+=incremento
-       #self.imprimir_linha_tabela(pdf, "TELHADOS: (  )BRASILIT  (  )GALVANIZADA  (  )BARRO     OUTROS:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+        linha+=incremento
+        self.imprimir_linha_tabela(pdf, "TELHADO: (  )BRASILIT  (  )GALVANIZADA  (  )BARRO     OUTROS:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
 
+        linha+=incremento
+        self.imprimir_linha_tabela(pdf, "PISO: (  )BATIDO  (  )CERÂMICA  (  )PORCELANATO       OUTROS:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
 
-        # Linhas de preenchimento
-        # cpdf.setFont("Helvetica", 12)
-        # pdf.drawString(50, 700, "NOME:")
-        # pdf.line(100, 698, 500, 698)  # Linha para preenchimento
+        linha+=2*incremento
+        self.imprimir_linha_tabela(pdf, "OBSERVAÇÕES PROFISSIONAL ENTREVISTADOR", linha, fonte="Helvetica-Bold", tamanho=12, posicao=0, fundo=colors.lightgrey)
+        
+        for i in range(12):
+            linha+=incremento
+            self.imprimir_linha_tabela(pdf, "", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+
+        self.imprimir_texto(pdf, "___________________________________________", self.mp(105), tamanho=8, posicao=0)  
+        self.imprimir_texto(pdf, "Assinatura e Carimbo", self.mp(100), tamanho=8, posicao=0)  
 
 
     def rodape(self, pdf):
@@ -219,8 +231,12 @@ class PDFGenerator:
     def create_pdf(self):
         c = canvas.Canvas(self.filename, pagesize=A4)
         self.cabecalho(c)
-        self.corpo(c)
-        self.rodape(c) 
+        self.pagina1(c)
+        self.rodape(c)
+        c.showPage()
+        self.cabecalho(c)
+        self.pagina2(c)
+        self.rodape(c)
         c.save()
 
 class App(QMainWindow):
