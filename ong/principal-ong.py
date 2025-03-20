@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QApplication
-import formulario, sys
+import formularioimp, sys
 
 app = QApplication(sys.argv)
-janela = formulario.MinhaJanela()
+janela = formularioimp.MinhaJanela()
 janela.show()
 app.exec()
