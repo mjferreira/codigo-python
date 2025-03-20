@@ -1,6 +1,8 @@
 import sys, os
 import subprocess
 import configparser
+import banco
+
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget
 )
@@ -212,7 +214,7 @@ class PDFGenerator:
         #self.imprimir_texto(pdf, "FICHA DE INSCRIÇÃO", self.altura_pagina-self.mp(linha-2), tamanho=12, posicao=0)
         
         linha+=incremento
-        self.imprimir_linha_tabela(pdf, "Data de Requerimento:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.largura_pagina-(2*self.mp(20)), fundo=colors.white)
+        self.imprimir_linha_tabela(pdf, "Data de Requerimento: "+resultado[0][27], linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.largura_pagina-(2*self.mp(20)), fundo=colors.white)
         #pdf.setFillColor(colors.white)  
         #pdf.rect(self.mp(20), self.altura_pagina-self.mp(linha), self.largura_pagina-(2*self.mp(20)), altura_coluna, fill=1)  # Preencher o retângulo
         #pdf.setFillColor(colors.black) 
@@ -239,10 +241,15 @@ class PDFGenerator:
         self.imprimir_linha_tabela(pdf, "FONE: "+resultado[0][9], linha, fonte="Helvetica", tamanho=10, posicao=self.mp(130), largura_coluna = self.mp(60), fundo=colors.white)
 
         linha+=incremento
-        self.imprimir_linha_tabela(pdf, "ENDEREÇO:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+        self.imprimir_linha_tabela(pdf, "ENDEREÇO: "+resultado[0][26], linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+        
+        id_bairro=resultado[0][7]
+        vsql="SELECT T_BAIRRO, N_ZONA FROM tb_bairro WHERE N_ID = "+ str(id_bairro)
+        res_temp = banco.consultar(vsql)
+        vbairro=[row[0] for row in res_temp]
         
         linha+=incremento
-        self.imprimir_linha_tabela(pdf, "BAIRRO:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(110), fundo=colors.white)
+        self.imprimir_linha_tabela(pdf, "BAIRRO: "+vbairro[0], linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(110), fundo=colors.white)
         self.imprimir_linha_tabela(pdf, "CEP:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(130), largura_coluna = self.mp(60), fundo=colors.white)
   
         linha+=incremento

@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QVBoxLayout, QWid
 from PyQt6.QtWidgets import QTableWidgetItem, QComboBox, QSizePolicy, QDialog, QTextEdit
 from PyQt6.QtGui import QAction, QIcon, QTextCursor
 from PyQt6.QtCore import QSize
+from datetime import datetime
 import banco
 import observacao
 import composicao
@@ -44,10 +45,10 @@ class MinhaJanela(QMainWindow):
         acao_mostrar.triggered.connect(self.mostrar_mensagem_sobre)
         # Adicionar ações ao menu
         menu_sobre.addAction(acao_mostrar)
-        self.denfir_formulario()
+        self.definir_formulario()
         self.definir_tabela_consulta()
         self.ocultar_itens()
-    def denfir_formulario(self):
+    def definir_formulario(self):
         self.botao1 = QPushButton("Gravar", self.central_widget)
         self.botao1.setFixedSize(80, 30)
         self.botao1.move(630,780)
@@ -134,7 +135,12 @@ class MinhaJanela(QMainWindow):
         self.l_end = QLabel("ENDEREÇO", self.central_widget)
         self.l_end.move(10,linha)
         self.l_end.setStyleSheet('color: red; font-size:16px;')
+        
+        self.leendereco = QLineEdit("",self.central_widget)
+        self.leendereco.setStyleSheet('background: white; color: black; font-size:18px;')
+        self.leendereco.setGeometry(120,linha,400,25)
 
+        linha=linha+30
         self.l_zona = QLabel("Zona:", self.central_widget)
         self.l_zona.move(120,linha)
         self.l_zona.setStyleSheet('color: red; font-size:16px;')
@@ -489,6 +495,7 @@ class MinhaJanela(QMainWindow):
         telhado=resultado[0][23]
         piso=resultado[0][24]
         self.data_observacao=resultado[0][25]
+        self.leendereco.setText(resultado[0][26])
         
         self.combo_medicacao.setCurrentText(medicacao)
         if len(nomebeneficio) != 0:
@@ -577,7 +584,7 @@ class MinhaJanela(QMainWindow):
         vsql="SELECT T_NOME, T_PARENTESCO, T_ESCOLA_TRABALHO  FROM tb_composicao WHERE T_CPF ="+str(cpf)
         resultado_composicao = banco.consultar(vsql)
         caminho_pdf = "/home/marcelo/Downloads/"
-        filename = caminho_pdf+"output1.pdf"
+        filename = caminho_pdf+resultado[0][0]+"-"+resultado[0][2]+".pdf"
         pdf_generator = relaimp.PDFGenerator(filename)
         pdf_generator.create_pdf(resultado, resultado_composicao)
         print("Pdf criado com sucesso")
@@ -629,6 +636,7 @@ class MinhaJanela(QMainWindow):
         self.lecpf.setVisible(True)
         self.lefone.setVisible(True)
         self.lecep.setVisible(True)
+        self.leendereco.setVisible(True)       
         self.lenis.setVisible(True)
         self.lemae.setVisible(True)
         self.lecpfmae.setVisible(True)
@@ -702,6 +710,7 @@ class MinhaJanela(QMainWindow):
         self.lpai.setVisible(False)
         self.lcpfpai.setVisible(False)
         self.lecpf.setVisible(False)
+        self.leendereco.setVisible(False)
         self.lecep.setVisible(False)
         self.lefone.setVisible(False)
         self.lenis.setVisible(False)
@@ -770,6 +779,7 @@ class MinhaJanela(QMainWindow):
                 vserieano=self.combo_escola_ano.currentText()
                 vsql="SELECT N_ID FROM tb_bairro WHERE T_BAIRRO = "+ '"' + vbairro + '"'
                 vbairro=[row[0] for row in banco.consultar(vsql)]
+                vendereco=self.leendereco.text()
     def inserir_registro(self):
         vnome=self.lenome.text()
         vrg=self.lerg.text()
@@ -779,6 +789,7 @@ class MinhaJanela(QMainWindow):
         vpai=self.lepai.text()
         vcpfpai=self.lecpfpai.text().replace("-", "").replace(".", "")
         vbairro=self.combo_bairro.currentText()
+        vendereco=self.leendereco.text()
         vnis=self.lenis.text().replace("-", "").replace(".", "")
         vfone=self.lefone.text().replace("(","").replace(")","").replace("-","")
         vcep=self.lecep.text().replace("-","")
@@ -811,9 +822,12 @@ class MinhaJanela(QMainWindow):
         vpiso=self.combo_piso.currentText()
         if vpiso == "Outros":
             vpiso=self.lepiso_outro.text()
-        vobs=self.data_observacao
+        vobs=self.data_observacao.replace("'", "")
         vsql="SELECT N_ID FROM tb_bairro WHERE T_BAIRRO = "+ '"' + vbairro + '"'
         vbairro=[row[0] for row in banco.consultar(vsql)]
+        
+        data_atual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Formato padrão ISO 8601
+        
         # vcpf=self.lecpf.text().replace("-", "").replace(".", "")
         if not self.cpf_valido(vcpf):
             QMessageBox.critical(self, "Erro Crítico","CPF INVÁLIDO !!!", QMessageBox.StandardButton.Ok)
@@ -821,6 +835,8 @@ class MinhaJanela(QMainWindow):
             QMessageBox.critical(self, "Erro Crítico","CPF JÁ CADASTRADO !!!", QMessageBox.StandardButton.Ok)
         elif len(vbairro) == 0:
             QMessageBox.critical(self, "Erro Crítico","Selecione o endereço !!!", QMessageBox.StandardButton.Ok)
+        elif len(vendereco) == 0:
+            QMessageBox.critical(self, "Erro Crítico.","Digite o endereço !!!", QMessageBox.StandardButton.Ok)
         elif not self.cpf_valido(vnis):
             QMessageBox.critical(self, "Erro Crítico","NIS INVÁLIDO !!!", QMessageBox.StandardButton.Ok)
         elif self.combo_recbeneficio.currentText() == "SIM" and self.combo_nomebeneficio.currentText() == "Outros" and len(vnomebeneficio) == 0:
@@ -836,7 +852,7 @@ class MinhaJanela(QMainWindow):
         elif self.combo_piso.currentText() == "Outros" and len(vpiso) == 0:
             QMessageBox.critical(self, "Erro Crítico","Tipo de Piso deve ser informado!!!", QMessageBox.StandardButton.Ok)
         else:
-            vsql="INSERT INTO tb_pessoa (T_NOME, T_RG, T_CPF, T_MAE, T_CPFMAE, T_PAI, T_CPFPAI, N_BAIRRO, T_NIS, T_FONE, T_CEP, T_GRAU_ENSINO, T_ESCOLA, T_SERIE_ANO, T_TRABALHA, T_RENDA, T_RECBENEFICIO, T_NOMEBENEFICIO, T_MEDICACAO, T_NOMEMEDICACAO, T_MORADIA, T_VALOR_ALUGUEL, T_PAREDES, T_TELHADO, T_PISO, T_OBS) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')" %(vnome, vrg, vcpf, vmae, vcpfmae, vpai, vcpfpai, vbairro[0], vnis, vfone, vcep, vgrau_ensino, vescola, vserieano, vtrabalha, vrenda, vrecbeneficio, vnomebeneficio, vmedicacao, vnomemedicacao, vmoradia, valuguel, vparedes, vtelhado, vpiso, vobs)
+            vsql="INSERT INTO tb_pessoa (T_NOME, T_RG, T_CPF, T_MAE, T_CPFMAE, T_PAI, T_CPFPAI, N_BAIRRO, T_NIS, T_FONE, T_CEP, T_GRAU_ENSINO, T_ESCOLA, T_SERIE_ANO, T_TRABALHA, T_RENDA, T_RECBENEFICIO, T_NOMEBENEFICIO, T_MEDICACAO, T_NOMEMEDICACAO, T_MORADIA, T_VALOR_ALUGUEL, T_PAREDES, T_TELHADO, T_PISO, T_OBS, T_ENDE, T_DATA_INS, T_DATA_MOD) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')" %(vnome, vrg, vcpf, vmae, vcpfmae, vpai, vcpfpai, vbairro[0], vnis, vfone, vcep, vgrau_ensino, vescola, vserieano, vtrabalha, vrenda, vrecbeneficio, vnomebeneficio, vmedicacao, vnomemedicacao, vmoradia, valuguel, vparedes, vtelhado, vpiso, vobs, vendereco, data_atual, data_atual)
             print(vsql)
             banco.atualizar(vsql)
             self.gravar_composicao()
@@ -848,6 +864,7 @@ class MinhaJanela(QMainWindow):
         self.lecpf.clear()
         self.lemae.clear()
         self.lecpfmae.clear()
+        self.leendereco.clear()
         self.lepai.clear()
         self.lecpfpai.clear()
         self.lenis.clear()
@@ -865,6 +882,7 @@ class MinhaJanela(QMainWindow):
         self.combo_medicacao.setCurrentIndex(1)
         self.lenomemedicacao.clear()
         self.combo_moradia.setCurrentIndex(1)
+        self.verificar_moradia()
         self.levalor_aluguel.clear()
         self.combo_paredes.setCurrentIndex(1)
         self.leparede_outro.clear()
@@ -883,6 +901,7 @@ class MinhaJanela(QMainWindow):
         vpai=self.lepai.text()
         vcpfpai=self.lecpfpai.text().replace("-", "").replace(".", "")
         vbairro=self.combo_bairro.currentText()
+        vendereco=self.leendereco.text()
         vnis=self.lenis.text().replace("-", "").replace(".", "")
         vfone=self.lefone.text().replace("(","").replace(")","").replace("-","")
         vcep=self.lecep.text().replace("-","")
@@ -916,15 +935,20 @@ class MinhaJanela(QMainWindow):
             vtelhado=self.letelhado_outro.text() 
         vpiso=self.combo_piso.currentText()
         if vpiso == "Outros":
-            vpiso=self.lepiso_outro.text()
-        vobs=self.data_observacao
+            vpiso=self.lepiso_outro.text()     
+        vobs=self.data_observacao.replace("'", "")
         print(vobs)
         vsql="SELECT N_ID FROM tb_bairro WHERE T_BAIRRO = "+ '"' + vbairro + '"'
         vbairro=[row[0] for row in banco.consultar(vsql)]
+        
+        data_atual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Formato padrão ISO 8601
+       
         if not self.cpf_valido(vcpf):
             QMessageBox.critical(self, "Erro Crítico","CPF INVÁLIDO !!!", QMessageBox.StandardButton.Ok)
         elif len(vbairro) == 0:
             QMessageBox.critical(self, "Erro Crítico","Selecione o endereço !!!", QMessageBox.StandardButton.Ok)
+        elif len(vendereco) == 0:   
+            QMessageBox.critical(self, "Erro Crítico","Digite o endereço !!!", QMessageBox.StandardButton.Ok)    
         elif not self.cpf_valido(vnis):
             QMessageBox.critical(self, "Erro Crítico","NIS INVÁLIDO !!!", QMessageBox.StandardButton.Ok)
         elif self.combo_recbeneficio.currentText() == "SIM" and self.combo_nomebeneficio.currentText() == "Outros" and len(vnomebeneficio) == 0:
@@ -941,7 +965,7 @@ class MinhaJanela(QMainWindow):
             QMessageBox.critical(self, "Erro Crítico","Tipo de Piso deve ser informado!!!", QMessageBox.StandardButton.Ok)            
         else:
             print(vsql)
-            vsql= "UPDATE tb_pessoa SET T_NOME='"+vnome+"',T_RG='"+vrg+"',T_CPF='"+vcpf+"',T_MAE='"+vmae+"',T_CPFMAE='"+vcpfmae+"',T_PAI='"+vpai+"',T_CPFPAI='"+vcpfpai+"',N_BAIRRO="+str(vbairro[0])+",T_NIS='"+vnis+"',T_FONE='"+vfone+"',T_CEP='"+vcep+"',T_GRAU_ENSINO='"+vgrau_ensino+"',T_ESCOLA='"+vescola+"',T_SERIE_ANO='"+vserieano+"',T_TRABALHA='"+vtrabalha+"',T_RENDA='"+vrenda+"',T_RECBENEFICIO='"+vrecbeneficio+"',T_NOMEBENEFICIO='"+vnomebeneficio+"',T_MEDICACAO='"+vmedicacao+"',T_NOMEMEDICACAO='"+vnomemedicacao+"',T_MORADIA='"+vmoradia+"',T_VALOR_ALUGUEL='"+valuguel+"',T_PAREDES='"+vparedes+"',T_TELHADO='"+vtelhado+"',T_PISO='"+vpiso+"',T_OBS='"+vobs+"' WHERE T_CPF="+vcpf
+            vsql= "UPDATE tb_pessoa SET T_NOME='"+vnome+"',T_RG='"+vrg+"',T_CPF='"+vcpf+"',T_MAE='"+vmae+"',T_CPFMAE='"+vcpfmae+"',T_PAI='"+vpai+"',T_CPFPAI='"+vcpfpai+"',N_BAIRRO="+str(vbairro[0])+",T_NIS='"+vnis+"',T_FONE='"+vfone+"',T_CEP='"+vcep+"',T_GRAU_ENSINO='"+vgrau_ensino+"',T_ESCOLA='"+vescola+"',T_SERIE_ANO='"+vserieano+"',T_TRABALHA='"+vtrabalha+"',T_RENDA='"+vrenda+"',T_RECBENEFICIO='"+vrecbeneficio+"',T_NOMEBENEFICIO='"+vnomebeneficio+"',T_MEDICACAO='"+vmedicacao+"',T_NOMEMEDICACAO='"+vnomemedicacao+"',T_MORADIA='"+vmoradia+"',T_VALOR_ALUGUEL='"+valuguel+"',T_PAREDES='"+vparedes+"',T_TELHADO='"+vtelhado+"',T_PISO='"+vpiso+"',T_OBS='"+vobs+"', T_ENDE='"+vendereco+"', T_DATA_MOD='"+data_atual+"' WHERE T_CPF="+vcpf
             banco.atualizar(vsql)
             self.gravar_composicao()
             self.consultar()

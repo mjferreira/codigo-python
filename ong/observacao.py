@@ -1,4 +1,6 @@
+from PyQt6.QtGui import QTextCursor
 from PyQt6.QtWidgets import QDialog, QTextEdit, QPushButton, QVBoxLayout
+import textwrap
 
 class ObservacaoWindow(QDialog):
     def __init__(self, parent=None, texto_atual=""):
@@ -23,7 +25,10 @@ class ObservacaoWindow(QDialog):
 
     def get_text(self):
         """ Retorna o texto digitado, já limitado a 400 caracteres """
-        return self.text_edit.toPlainText()[:400]
+        text =  self.text_edit.toPlainText()[:400]
+        formatted_text = textwrap.fill(text, width=80)
+        return formatted_text
+        
 
     def limitar_texto(self):
         """ Impede que o usuário digite mais de 400 caracteres """
