@@ -9,6 +9,21 @@ import observacao
 import composicao
 import relaimp
 import subprocess
+import configparser
+
+
+# Criar um objeto ConfigParser
+config = configparser.ConfigParser()
+# Ler o arquivo de configuração
+config.read('config.ini')
+nome_fantasia = config['configuracao']['nome_fantasia']
+empresa = config['configuracao']['empresa']
+end_empresa = config['configuracao']['end_empresa']
+cnpj_empresa = config['configuracao']['cnpj_empresa']
+email_empresa = config['configuracao']['email_empresa']
+fone_empresa = config['configuracao']['fone_empresa']
+caminho_pdf = config['ambiente']['caminho_pdf']
+caminho_icones = config['ambiente']['caminho_icones']
 
 class MinhaJanela(QMainWindow):
     def __init__(self):
@@ -440,8 +455,8 @@ class MinhaJanela(QMainWindow):
             for col_idx, valor in enumerate(linha):
                 self.tabela.setItem(linha_idx, col_idx, QTableWidgetItem(str(valor)))
             # Botão Editar
-            botao_editar = QPushButton("")
-            icone_editar = QIcon("edicao.png")  # Substitua com o caminho do seu ícone
+            botao_editar = QPushButton("")            
+            icone_editar = QIcon(caminho_icones+"edicao.png")  # Substitua com o caminho do seu ícone
             botao_editar.setIcon(icone_editar)
             botao_editar.setIconSize(QSize(32, 32))  # Tamanho do ícone
             # botao_editar.setStyleSheet("background-color: green; color black;")
@@ -449,7 +464,7 @@ class MinhaJanela(QMainWindow):
             self.tabela.setCellWidget(linha_idx, 3, botao_editar)
             # Botão Excluir
             botao_excluir = QPushButton("")
-            icone_excluir = QIcon("trash-can-red.jpg")  # Substitua com o caminho do seu ícone
+            icone_excluir = QIcon(caminho_icones+"trash-can-red.jpg")  # Substitua com o caminho do seu ícone
             botao_excluir.setIcon(icone_excluir)
             botao_excluir.setIconSize(QSize(32, 32))  # Tamanho do ícone
             #botao_excluir.setStyleSheet("background-color: red; color white;")
@@ -457,7 +472,7 @@ class MinhaJanela(QMainWindow):
             self.tabela.setCellWidget(linha_idx, 4, botao_excluir)
             # Botão Imprimir
             botao_imprimir = QPushButton("")
-            icone_imprimir = QIcon("imp.png")  # Substitua com o caminho do seu ícone
+            icone_imprimir = QIcon(caminho_icones+"imp.png")  # Substitua com o caminho do seu ícone
             botao_imprimir.setIcon(icone_imprimir)
             botao_imprimir.setIconSize(QSize(32, 32))  # Tamanho do ícone
             #botao_imprimir.setStyleSheet("background-color: red; color white;")
@@ -583,7 +598,6 @@ class MinhaJanela(QMainWindow):
         """Carrega os dados do banco de dados para a tabela"""
         vsql="SELECT T_NOME, T_PARENTESCO, T_ESCOLA_TRABALHO  FROM tb_composicao WHERE T_CPF ="+str(cpf)
         resultado_composicao = banco.consultar(vsql)
-        caminho_pdf = "/home/marcelo/Downloads/"
         filename = caminho_pdf+resultado[0][0]+"-"+resultado[0][2]+".pdf"
         pdf_generator = relaimp.PDFGenerator(filename)
         pdf_generator.create_pdf(resultado, resultado_composicao)
