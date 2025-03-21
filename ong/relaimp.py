@@ -288,17 +288,43 @@ class PDFGenerator:
         self.imprimir_linha_tabela(pdf, "RENDA", linha, fonte="Helvetica-Bold", tamanho=12, posicao=0, fundo=colors.lightgrey)
  
         linha+=incremento
-        self.imprimir_linha_tabela(pdf, "TRABALHA: (  ) SIM  (  ) NÃO", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(105), fundo=colors.white)
-        self.imprimir_linha_tabela(pdf, "RENDA FAMILIAR: R$", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(105), largura_coluna = self.mp(85), fundo=colors.white)
+        if resultado[0][14] == "SIM":
+            self.imprimir_linha_tabela(pdf, "TRABALHA: ( X ) SIM  (   ) NÃO", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(105), fundo=colors.white)
+        else:
+            self.imprimir_linha_tabela(pdf, "TRABALHA: (   ) SIM  ( X ) NÃO", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(105), fundo=colors.white)
+            
+        self.imprimir_linha_tabela(pdf, "RENDA FAMILIAR: R$ "+resultado[0][15], linha, fonte="Helvetica", tamanho=10, posicao=self.mp(105), largura_coluna = self.mp(85), fundo=colors.white)
+        
        
         linha+=incremento
-        self.imprimir_linha_tabela(pdf, "RECEBE BENEFÍCIO: (  ) SIM  (  ) NÃO", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
-        
+        if resultado[0][16] == "SIM":
+            self.imprimir_linha_tabela(pdf, "RECEBE BENEFÍCIO: ( X ) SIM  (   ) NÃO", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+        else:    
+            self.imprimir_linha_tabela(pdf, "RECEBE BENEFÍCIO: (   ) SIM  ( X ) NÃO", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)          
+
         linha+=incremento
-        self.imprimir_linha_tabela(pdf, "SE SIM, QUAL: (  ) BPC  (  ) BOLSA FAMÍLIA  (  ) APOSENTADORIA", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+        if resultado[0][16] == "NÃO": 
+            self.imprimir_linha_tabela(pdf, "SE SIM, QUAL: (   ) BPC  (   ) BOLSA FAMÍLIA  (   ) APOSENTADORIA", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white) 
+            linha+=incremento
+            self.imprimir_linha_tabela(pdf, "OUTROS:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+        elif resultado[0][17] == "BPC": 
+            self.imprimir_linha_tabela(pdf, "SE SIM, QUAL: ( X ) BPC  (   ) BOLSA FAMÍLIA  (   ) APOSENTADORIA", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white) 
+            linha+=incremento
+            self.imprimir_linha_tabela(pdf, "OUTROS:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)           
+        elif resultado[0][17] == "Bolsa Família":
+            self.imprimir_linha_tabela(pdf, "SE SIM, QUAL: (   ) BPC  ( X ) BOLSA FAMÍLIA  (   ) APOSENTADORIA", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white) 
+            linha+=incremento
+            self.imprimir_linha_tabela(pdf, "OUTROS:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+        elif resultado[0][17] == "Aponsentadoria":
+            self.imprimir_linha_tabela(pdf, "SE SIM, QUAL: (   ) BPC  (   ) BOLSA FAMÍLIA  ( X ) APOSENTADORIA", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white) 
+            linha+=incremento
+            self.imprimir_linha_tabela(pdf, "OUTROS:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+        else:
+            self.imprimir_linha_tabela(pdf, "SE SIM, QUAL: (   ) BPC  (   ) BOLSA FAMÍLIA  (   ) APOSENTADORIA", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white) 
+            linha+=incremento
+            self.imprimir_linha_tabela(pdf, "OUTROS: "+resultado[0][17], linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
  
-        linha+=incremento
-        self.imprimir_linha_tabela(pdf, "OUTROS:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+        
  
         linha+=incremento
         self.imprimir_linha_tabela(pdf, "INFORMAÇÕES PESSOAIS", linha, fonte="Helvetica-Bold", tamanho=12, posicao=0, fundo=colors.lightgrey)
