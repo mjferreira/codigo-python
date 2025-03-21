@@ -1,9 +1,10 @@
 import sqlite3
 from sqlite3 import Error
-import os
+import os, sys
 
-pastaApp=os.path.dirname(__file__)
-caminho=pastaApp+"/ong.db"
+
+BASE_DIR = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.path.dirname(os.path.abspath(__file__))
+caminho = os.path.join(BASE_DIR, "ong.db")
 
 ########## Criar Conexão
 def ConexaoBanco():

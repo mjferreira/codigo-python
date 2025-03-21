@@ -608,7 +608,7 @@ class MinhaJanela(QMainWindow):
     def open_pdf(self, filename):
         try:
             # Tenta abrir o PDF com o visualizador padrão
-            subprocess.run(['xdg-open', filename])
+            subprocess.run(['/usr/bin/xdg-open', filename])
         except Exception as e:
             print(f"Erro ao abrir o PDF: {e}")     
     def inserir(self):
