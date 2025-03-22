@@ -8,13 +8,13 @@ class TableWindow(QDialog):
         super().__init__(parent)
 
         self.setWindowTitle("Composição Familiar")
-        self.resize(720, 400)
+        self.resize(720, 340)
         # Criando a tabela
         self.tabela_composicao = QTableWidget(0, 3)  # Inicia com 0 linhas e 3 colunas
         self.tabela_composicao.setHorizontalHeaderLabels(["Nome", "Parentesco", "Escola/Local de Trabalho"])
-        self.tabela_composicao.setColumnWidth(0, 200)
+        self.tabela_composicao.setColumnWidth(0, 295)
         self.tabela_composicao.setColumnWidth(1, 100)
-        self.tabela_composicao.setColumnWidth(2, 395)
+        self.tabela_composicao.setColumnWidth(2, 300)
 
 
         self.botao_add = QPushButton("Adicionar")
@@ -32,21 +32,31 @@ class TableWindow(QDialog):
         layout.addLayout(btn_layout)
         layout.addWidget(self.btn_ok)
         self.setLayout(layout)
+        self.tabela_composicao.itemChanged.connect(self.verificar_tamanho)
 
         # Preencher tabela com dados existentes
         if data:
             self.load_data(data)
 
+    def verificar_tamanho(self, item):
+        texto = item.text()
+        if len(texto) > 30:
+            item.setText(texto[:30])
+
     def adiciona_composicao(self, nome="", parentesco="Filho(a)", local=""):
         """Adiciona uma nova linha com valores opcionais"""
         row_position = self.tabela_composicao.rowCount()
-        self.tabela_composicao.insertRow(row_position)
-        self.tabela_composicao.setItem(row_position, 0, QTableWidgetItem(nome))
-        self.tabela_composicao.setItem(row_position, 2, QTableWidgetItem(local))
-        combo = QComboBox()
-        combo.addItems(["Esposo(a)","Pai", "Mãe", "Filho(a)", "Avô(ó)","Sobrinho(a)","Enteado(a)","Tio(a)", "Gênro", "Nora", "Primo(a)"])
-        combo.setCurrentText(parentesco)
-        self.tabela_composicao.setCellWidget(row_position, 1, combo)
+        print(row_position)
+        if row_position == 7:
+            QMessageBox.critical(self, "Composição Familiar Excedido","Número máximo de Composição Familiar igual a 7 !!!", QMessageBox.StandardButton.Ok)
+        else:
+            self.tabela_composicao.insertRow(row_position)
+            self.tabela_composicao.setItem(row_position, 0, QTableWidgetItem(nome))
+            self.tabela_composicao.setItem(row_position, 2, QTableWidgetItem(local))
+            combo = QComboBox()
+            combo.addItems(["Esposo(a)","Pai", "Mãe", "Filho(a)", "Avô(ó)","Sobrinho(a)","Enteado(a)","Tio(a)", "Gênro", "Nora", "Primo(a)"])
+            combo.setCurrentText(parentesco)
+            self.tabela_composicao.setCellWidget(row_position, 1, combo)
 
     def remove_composicao(self):
         """Remove a linha selecionada"""

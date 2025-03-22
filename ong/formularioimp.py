@@ -101,6 +101,7 @@ class MinhaJanela(QMainWindow):
         self.lenome = QLineEdit("", self.central_widget)
         self.lenome.setGeometry(80,linha,400,25)
         self.lenome.setStyleSheet('background: white; color: black; font-size:18px;')
+        self.lenome.setMaxLength(60)
 
         self.lcpf = QLabel("CPF:",self.central_widget)
         self.lcpf.move(500,linha)
@@ -154,6 +155,7 @@ class MinhaJanela(QMainWindow):
         self.leendereco = QLineEdit("",self.central_widget)
         self.leendereco.setStyleSheet('background: white; color: black; font-size:18px;')
         self.leendereco.setGeometry(120,linha,400,25)
+        self.leendereco.setMaxLength(60)
 
         linha=linha+30
         self.l_zona = QLabel("Zona:", self.central_widget)
@@ -234,6 +236,7 @@ class MinhaJanela(QMainWindow):
         self.leescola = QLineEdit("", self.central_widget)
         self.leescola.setGeometry(310,linha,400,25)
         self.leescola.setStyleSheet('background: white; color: black; font-size:18px;')
+        self.leescola.setMaxLength(60)
 
         linha=linha+30
         self.lescola_ano = QLabel("Série/Ano:",self.central_widget)
@@ -293,6 +296,7 @@ class MinhaJanela(QMainWindow):
         self.leoutrobeneficio = QLineEdit("", self.central_widget)
         self.leoutrobeneficio.setGeometry(450,linha,200,25)
         self.leoutrobeneficio.setStyleSheet('background: white; color: black; font-size:18px;')
+        self.leoutrobeneficio.setMaxLength(40)
 
         linha=linha+25
         self.linhainfpes = QLabel("_____________________________INFORMAÇÕES PESSOAIS_______________________________",self.central_widget)
@@ -317,6 +321,7 @@ class MinhaJanela(QMainWindow):
         self.lenomemedicacao = QLineEdit("", self.central_widget)
         self.lenomemedicacao.setGeometry(450,linha,200,25)
         self.lenomemedicacao.setStyleSheet('background: white; color: black; font-size:18px;')
+        self.lenomemedicacao.setMaxLength(40)
 
         linha=linha+25
         self.linhacompo = QLabel("______________________________COMPOSIÇÃO FAMILIAR________________________________",self.central_widget)
@@ -372,6 +377,7 @@ class MinhaJanela(QMainWindow):
         self.leparede_outro = QLineEdit("", self.central_widget)
         self.leparede_outro.setGeometry(450,linha,150,25)
         self.leparede_outro.setStyleSheet('background: white; color: black; font-size:18px;')
+        self.leparede_outro.setMaxLength(20)
 
         linha=linha+30
         self.ltelhado = QLabel("Telhado:",self.central_widget)
@@ -389,7 +395,8 @@ class MinhaJanela(QMainWindow):
         self.ltelhado_outro.adjustSize()
         self.letelhado_outro = QLineEdit("", self.central_widget)
         self.letelhado_outro.setGeometry(450,linha,150,25)
-        self.letelhado_outro.setStyleSheet('background: white; color: black; font-size:18px;')       
+        self.letelhado_outro.setStyleSheet('background: white; color: black; font-size:18px;')     
+        self.letelhado_outro.setMaxLength(20)  
 
         linha=linha+30
         self.lpiso = QLabel("Piso:",self.central_widget)
@@ -408,6 +415,7 @@ class MinhaJanela(QMainWindow):
         self.lepiso_outro = QLineEdit("", self.central_widget)
         self.lepiso_outro.setGeometry(450,linha,150,25)
         self.lepiso_outro.setStyleSheet('background: white; color: black; font-size:18px;')
+        self.lepiso_outro.setMaxLength(20)
 
         linha=linha+30
         self.linhaobservacao = QLabel("___________________________________OBSERVAÇOES___________________________________",self.central_widget)

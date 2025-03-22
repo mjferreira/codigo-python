@@ -144,15 +144,15 @@ class PDFGenerator:
         self.imprimir_linha_tabela(pdf, "COMPOSIÇÃO FAMILIAR", linha, fonte="Helvetica-Bold", tamanho=12, posicao=0, fundo=colors.lightgrey)
    
         linha+=incremento
-        self.imprimir_linha_tabela(pdf, "Nome:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(55), fundo=colors.white)
-        self.imprimir_linha_tabela(pdf, "Parentesco:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(75), largura_coluna = self.mp(55), fundo=colors.white)
-        self.imprimir_linha_tabela(pdf, "Estuda/Trabalha - Local:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(130), largura_coluna = self.mp(60), fundo=colors.white)
+        self.imprimir_linha_tabela(pdf, "Nome:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(70), fundo=colors.white)
+        self.imprimir_linha_tabela(pdf, "Parentesco:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(90), largura_coluna = self.mp(25), fundo=colors.white)
+        self.imprimir_linha_tabela(pdf, "Estuda/Trabalha - Local:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(115), largura_coluna = self.mp(75), fundo=colors.white)
 
         for i in range(7):
             linha+=incremento
-            self.imprimir_linha_tabela(pdf, "", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(55), fundo=colors.white)
-            self.imprimir_linha_tabela(pdf, "", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(75), largura_coluna = self.mp(55), fundo=colors.white)
-            self.imprimir_linha_tabela(pdf, "", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(130), largura_coluna = self.mp(60), fundo=colors.white)
+            self.imprimir_linha_tabela(pdf, "", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(70), fundo=colors.white)
+            self.imprimir_linha_tabela(pdf, "", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(90), largura_coluna = self.mp(25), fundo=colors.white)
+            self.imprimir_linha_tabela(pdf, "", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(115), largura_coluna = self.mp(75), fundo=colors.white)
 
         linha+=incremento
         self.imprimir_linha_tabela(pdf, "SITUAÇÃO DE MORADIAS", linha, fonte="Helvetica-Bold", tamanho=12, posicao=0, fundo=colors.lightgrey)
@@ -330,27 +330,50 @@ class PDFGenerator:
         self.imprimir_linha_tabela(pdf, "INFORMAÇÕES PESSOAIS", linha, fonte="Helvetica-Bold", tamanho=12, posicao=0, fundo=colors.lightgrey)
 
         linha+=incremento
-        self.imprimir_linha_tabela(pdf, "FAZ USO DE MEDICAÇÃO: (  ) SIM  (  ) NÃO    SE, SIM, QUAL:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+        if resultado[0][18] == "NÃO":
+            self.imprimir_linha_tabela(pdf, "FAZ USO DE MEDICAÇÃO: (   ) SIM  ( X ) NÃO    SE, SIM, QUAL:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+        else:    
+            self.imprimir_linha_tabela(pdf, "FAZ USO DE MEDICAÇÃO: ( X ) SIM  (   ) NÃO    SE, SIM, QUAL: "+resultado[0][19], linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
 
         linha+=2*incremento
         self.imprimir_linha_tabela(pdf, "COMPOSIÇÃO FAMILIAR", linha, fonte="Helvetica-Bold", tamanho=12, posicao=0, fundo=colors.lightgrey)
    
         linha+=incremento
-        self.imprimir_linha_tabela(pdf, "Nome:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(55), fundo=colors.white)
-        self.imprimir_linha_tabela(pdf, "Parentesco:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(75), largura_coluna = self.mp(55), fundo=colors.white)
-        self.imprimir_linha_tabela(pdf, "Estuda/Trabalha - Local:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(130), largura_coluna = self.mp(60), fundo=colors.white)
+        self.imprimir_linha_tabela(pdf, "Nome:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(70), fundo=colors.white)
+        self.imprimir_linha_tabela(pdf, "Parentesco:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(90), largura_coluna = self.mp(25), fundo=colors.white)
+        self.imprimir_linha_tabela(pdf, "Estuda/Trabalha - Local:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(115), largura_coluna = self.mp(75), fundo=colors.white)
 
-        for i in range(7):
+        vsql="SELECT T_NOME, T_PARENTESCO, T_ESCOLA_TRABALHO  FROM tb_composicao WHERE T_CPF ="+resultado[0][2]
+        rows = banco.consultar(vsql)
+        print(rows)
+        # Adiciona os dados à tabela
+        intervalo=7
+        for row in rows:
             linha+=incremento
-            self.imprimir_linha_tabela(pdf, "", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(55), fundo=colors.white)
-            self.imprimir_linha_tabela(pdf, "", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(75), largura_coluna = self.mp(55), fundo=colors.white)
-            self.imprimir_linha_tabela(pdf, "", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(130), largura_coluna = self.mp(60), fundo=colors.white)
+            self.imprimir_linha_tabela(pdf, row[0], linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(70), fundo=colors.white)
+            self.imprimir_linha_tabela(pdf, row[1], linha, fonte="Helvetica", tamanho=10, posicao=self.mp(90), largura_coluna = self.mp(25), fundo=colors.white)
+            self.imprimir_linha_tabela(pdf, row[2], linha, fonte="Helvetica", tamanho=10, posicao=self.mp(115), largura_coluna = self.mp(75), fundo=colors.white)
+            intervalo-=1
+            if intervalo == 0:
+                break
+        
+        for i in range(intervalo):
+            linha+=incremento
+            self.imprimir_linha_tabela(pdf, "", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(75), fundo=colors.white)
+            self.imprimir_linha_tabela(pdf, "", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(90), largura_coluna = self.mp(25), fundo=colors.white)
+            self.imprimir_linha_tabela(pdf, "", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(115), largura_coluna = self.mp(75), fundo=colors.white)
 
         linha+=incremento
         self.imprimir_linha_tabela(pdf, "SITUAÇÃO DE MORADIAS", linha, fonte="Helvetica-Bold", tamanho=12, posicao=0, fundo=colors.lightgrey)
      
         linha+=incremento
-        self.imprimir_linha_tabela(pdf, "CASA: (  )PRÓPRIA  (  )ALUGADA  (  )CEDIDA", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+        if resultado[0][20] == "Própria":
+            self.imprimir_linha_tabela(pdf, "CASA: ( X ) PRÓPRIA  (   ) ALUGADA  (   ) CEDIDA", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+        elif resultado[0][20] == "Alugada": 
+            self.imprimir_linha_tabela(pdf, "CASA: (   ) PRÓPRIA  ( X ) ALUGADA  (   ) CEDIDA", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+        else:
+            self.imprimir_linha_tabela(pdf, "CASA: (   ) PRÓPRIA  (   ) ALUGADA  ( X ) CEDIDA", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+    
 
     def pagina2(self,pdf, resultado, resultado_composicao):
         x1, y1 = self.mp(20), self.mp(141)  # Ponto inferior esquerdo
@@ -361,16 +384,35 @@ class PDFGenerator:
         pdf.rect(x1, y1, x2 - x1, y2 - y1, stroke=1, fill=0)  # Retângulo externo
 
         linha=30+incremento
-        self.imprimir_linha_tabela(pdf, "SE ALUGUEL, QUANTO: R$", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+        self.imprimir_linha_tabela(pdf, "SE ALUGUEL, QUANTO: R$ "+resultado[0][21], linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
         
         linha+=incremento
-        self.imprimir_linha_tabela(pdf, "PAREDES: (  )ALVENÁRIA  (  )MADEIRA                   OUTROS:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+        if resultado[0][22] == "Alvenaria":
+            self.imprimir_linha_tabela(pdf, "PAREDES: ( X ) ALVENARIA  (   ) MADEIRA                   OUTROS:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+        elif resultado[0][22] == "Madeira":
+            self.imprimir_linha_tabela(pdf, "PAREDES: (   ) ALVENARIA  ( X ) MADEIRA                   OUTROS:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+        else:
+            self.imprimir_linha_tabela(pdf, "PAREDES: (   ) ALVENARIA  (   ) MADEIRA                   OUTROS: "+resultado[0][22], linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+  
+        linha+=incremento
+        if resultado[0][23] == "Brasilit":
+            self.imprimir_linha_tabela(pdf, "TELHADO: ( X ) BRASILIT  (   ) GALVANIZADA  (   ) BARRO     OUTROS:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+        elif resultado[0][23] == "Galvanizada":
+            self.imprimir_linha_tabela(pdf, "TELHADO: (   ) BRASILIT  ( X ) GALVANIZADA  (   ) BARRO     OUTROS:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+        elif resultado[0][23] == "Barro":
+            self.imprimir_linha_tabela(pdf, "TELHADO: (   ) BRASILIT  (   ) GALVANIZADA  ( X ) BARRO     OUTROS:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+        else:
+            self.imprimir_linha_tabela(pdf, "TELHADO: (   ) BRASILIT  (   ) GALVANIZADA  (   ) BARRO     OUTROS: "+resultado[0][23], linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
 
         linha+=incremento
-        self.imprimir_linha_tabela(pdf, "TELHADO: (  )BRASILIT  (  )GALVANIZADA  (  )BARRO     OUTROS:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
-
-        linha+=incremento
-        self.imprimir_linha_tabela(pdf, "PISO: (  )BATIDO  (  )CERÂMICA  (  )PORCELANATO       OUTROS:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+        if resultado[0][24] == "Batido":
+            self.imprimir_linha_tabela(pdf, "PISO: ( X ) BATIDO  (   ) CERÂMICA  (   ) PORCELANATO       OUTROS:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+        elif resultado[0][24] == "Cerâmica":
+            self.imprimir_linha_tabela(pdf, "PISO: (   ) BATIDO  ( X ) CERÂMICA  (   ) PORCELANATO       OUTROS:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+        elif resultado[0][24] == "Porcelanato":
+            self.imprimir_linha_tabela(pdf, "PISO: (   ) BATIDO  (   ) CERÂMICA  ( X ) PORCELANATO       OUTROS:", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+        else:
+            self.imprimir_linha_tabela(pdf, "PISO: (   ) BATIDO  (   ) CERÂMICA  (   ) PORCELANATO       OUTROS: "+resultado[0][24], linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
 
         linha+=2*incremento
         self.imprimir_linha_tabela(pdf, "OBSERVAÇÕES PROFISSIONAL ENTREVISTADOR", linha, fonte="Helvetica-Bold", tamanho=12, posicao=0, fundo=colors.lightgrey)
