@@ -1,0 +1,2 @@
+python -m PyInstaller --noconsole --onefile --clean --add-data=config-win.ini;. --add-data=ong.db;. --icon "logo.ico" --add-data=logo.ico;. principal-ong.py
+

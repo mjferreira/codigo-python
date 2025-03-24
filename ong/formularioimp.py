@@ -1,6 +1,6 @@
 import re, sys, os
 from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QVBoxLayout, QWidget, QPushButton, QLineEdit, QHBoxLayout, QMessageBox, QTableWidget
-from PyQt6.QtWidgets import QTableWidgetItem, QComboBox, QSizePolicy, QDialog, QTextEdit
+from PyQt6.QtWidgets import QTableWidgetItem, QComboBox, QSizePolicy, QDialog, QTextEdit, QScrollArea
 from PyQt6.QtGui import QAction, QIcon, QTextCursor
 from PyQt6.QtCore import QSize
 from datetime import datetime
@@ -15,7 +15,10 @@ import configparser
 # Criar um objeto ConfigParser
 config = configparser.ConfigParser()
 # Ler o arquivo de configuração
-config.read('config.ini')
+if os.name == 'nt':
+    config.read('config-win.ini')
+else:
+    config.read('config.ini')
 nome_fantasia = config['configuracao']['nome_fantasia']
 empresa = config['configuracao']['empresa']
 end_empresa = config['configuracao']['end_empresa']
@@ -29,12 +32,24 @@ class MinhaJanela(QMainWindow):
     def __init__(self):
         super().__init__()
         # self.resize(600,500)
-        self.setGeometry(500, 100, 720, 850)
-        self.setWindowTitle("Ong Amazonia Vivia")
-        self.setStyleSheet("background-color: lightblue; color: black;")
+        
+        # Criar a área de rolagem
+        self.scroll = QScrollArea()
+        self.setCentralWidget(self.scroll)
+        self.scroll.setWidgetResizable(True)  # Importante para redimensionamento           
+        
         # Criando um widget central
         self.central_widget = QWidget()
-        self.setCentralWidget(self.central_widget)
+        self.scroll.setWidget(self.central_widget)
+        # self.setCentralWidget(self.central_widget)
+        
+        
+        self.setGeometry(500, 100, 740, 500)
+        self.central_widget.setMinimumSize(700,820)
+        self.setWindowTitle("Ong Amazonia Vivia")
+        self.setStyleSheet("background-color: lightblue; color: black;")         
+            
+      
         # Criar a barra de menuInserir
         menu_bar = self.menuBar()
         menu_bar.setStyleSheet("background-color: lightgray; color: black;")
@@ -60,6 +75,9 @@ class MinhaJanela(QMainWindow):
         acao_mostrar.triggered.connect(self.mostrar_mensagem_sobre)
         # Adicionar ações ao menu
         menu_sobre.addAction(acao_mostrar)
+        
+
+        
         self.definir_formulario()
         self.definir_tabela_consulta()
         self.ocultar_itens()
@@ -616,7 +634,10 @@ class MinhaJanela(QMainWindow):
     def open_pdf(self, filename):
         try:
             # Tenta abrir o PDF com o visualizador padrão
-            subprocess.run(['/usr/bin/xdg-open', filename])
+            if os.name == 'nt':
+                os.startfile(filename)
+            else:
+                subprocess.run(['/usr/bin/xdg-open', filename])
             # os.system("/usr/bin/evince "+'"'+filename+'"')
         except Exception as e:
             print(f"Erro ao abrir o PDF: {e}")     

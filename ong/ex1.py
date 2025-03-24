@@ -1,46 +1,43 @@
-from reportlab.lib.pagesizes import A4
-from reportlab.pdfgen import canvas
-from reportlab.lib import colors
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+from PyQt6.QtWidgets import (QApplication, QMainWindow, QScrollArea, QWidget, 
+                            QLabel, QLineEdit, QPushButton)
 
-def criar_pdf():
-    """Cria um PDF com exemplos de bordas em tabelas"""
-    nome_pdf = "tabela_bordas.pdf"
-    doc = SimpleDocTemplate(nome_pdf, pagesize=A4)
-    elementos = []
+class AbsoluteScrollForm(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Formulário com Scroll Absoluto")
+        
+        # Criar QScrollArea como widget central
+        scroll_area = QScrollArea()
+        self.setCentralWidget(scroll_area)
+        scroll_area.setWidgetResizable(True)
+        
+        # Widget de conteúdo que terá posicionamento absoluto
+        content_widget = QWidget()
+        scroll_area.setWidget(content_widget)
+        content_widget.setMinimumSize(800, 1200)  # Tamanho maior que a janela
+        
+        # Adicionar widgets com posicionamento absoluto
+        label1 = QLabel("Nome:", content_widget)
+        label1.move(20, 20)
+        
+        input1 = QLineEdit(content_widget)
+        input1.move(120, 20)
+        input1.resize(200, 25)
+        
+        label2 = QLabel("Endereço:", content_widget)
+        label2.move(20, 60)
+        
+        input2 = QLineEdit(content_widget)
+        input2.move(120, 60)
+        input2.resize(300, 25)
+        
+        # Adicionar mais widgets em posições específicas...
+        button = QPushButton("Enviar", content_widget)
+        button.move(20, 500)
+        button.resize(100, 30)
 
-    # Dados da tabela
-    dados = [
-        ["Tipo de Borda", "Exemplo"],
-        ["Sem borda", "Texto 1"],
-        ["Borda sólida", "Texto 2"],
-        ["Apenas borda externa", "Texto 3"],
-        ["Borda personalizada", "Texto 4"],
-    ]
-
-    # Criar tabela base
-    tabela = Table(dados, colWidths=[200, 200])
-
-    # Estilos de borda
-    estilo = TableStyle([
-        ("FONT", (0, 0), (-1, 0), "Helvetica-Bold"),  # Negrito no cabeçalho
-        ("BACKGROUND", (0, 0), (-1, 0), colors.grey),  # Fundo do cabeçalho
-        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),  # Cor do texto do cabeçalho
-        ("ALIGN", (0, 0), (-1, -1), "CENTER"),  # Centralizar texto
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),  # Alinhar verticalmente
-        ("GRID", (0, 1), (-1, 1), 0, colors.white),  # Sem borda (linha 1)
-        ("GRID", (0, 2), (-1, 2), 1, colors.black),  # Borda sólida (linha 2)
-        ("BOX", (0, 3), (-1, 3), 2, colors.red),  # Apenas borda externa (linha 3)
-        ("INNERGRID", (0, 4), (-1, 4), 1, colors.blue),  # Linhas internas em azul (linha 4)
-        ("BOX", (0, 4), (-1, 4), 2, colors.green),  # Borda externa em verde (linha 4)
-    ])
-
-    tabela.setStyle(estilo)
-    elementos.append(tabela)
-
-    # Criar o PDF
-    doc.build(elementos)
-    print(f"PDF '{nome_pdf}' gerado com sucesso!")
-
-# Gerar o PDF com bordas
-criar_pdf()
+app = QApplication([])
+window = AbsoluteScrollForm()
+window.resize(400, 300)
+window.show()
+app.exec()
