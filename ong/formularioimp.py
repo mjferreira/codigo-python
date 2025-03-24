@@ -616,7 +616,7 @@ class MinhaJanela(QMainWindow):
     def open_pdf(self, filename):
         try:
             # Tenta abrir o PDF com o visualizador padrão
-            subprocess.run(['/usr/bin/xdg-open', filename])
+            subprocess.run(['/home/marcelo/abrir-pdf.sh', filename])
             # os.system("/usr/bin/evince "+'"'+filename+'"')
         except Exception as e:
             print(f"Erro ao abrir o PDF: {e}")     
