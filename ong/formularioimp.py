@@ -490,7 +490,7 @@ class MinhaJanela(QMainWindow):
             self.tabela.setCellWidget(linha_idx, 3, botao_editar)
             # Botão Excluir
             botao_excluir = QPushButton("")
-            icone_excluir = QIcon(caminho_icones+"trash-can-red.jpg")  # Substitua com o caminho do seu ícone
+            icone_excluir = QIcon(caminho_icones+"trash-can-red.png")  # Substitua com o caminho do seu ícone
             botao_excluir.setIcon(icone_excluir)
             botao_excluir.setIconSize(QSize(32, 32))  # Tamanho do ícone
             #botao_excluir.setStyleSheet("background-color: red; color white;")
