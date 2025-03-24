@@ -13,7 +13,10 @@ from reportlab.lib import colors
 # Criar um objeto ConfigParser
 config = configparser.ConfigParser()
 # Ler o arquivo de configuração
-config.read('config.ini')
+if os.name == 'nt':
+    config.read('config-win.ini')
+else:
+    config.read('config.ini')
 nome_fantasia = config['configuracao']['nome_fantasia']
 empresa = config['configuracao']['empresa']
 end_empresa = config['configuracao']['end_empresa']
