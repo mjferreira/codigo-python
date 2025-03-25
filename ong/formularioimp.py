@@ -490,7 +490,7 @@ class MinhaJanela(QMainWindow):
             self.tabela.setCellWidget(linha_idx, 3, botao_editar)
             # Botão Excluir
             botao_excluir = QPushButton("")
-            icone_excluir = QIcon(caminho_icones+"trash-can-red.png")  # Substitua com o caminho do seu ícone
+            icone_excluir = QIcon(caminho_icones+"remocao.png")  # Substitua com o caminho do seu ícone
             botao_excluir.setIcon(icone_excluir)
             botao_excluir.setIconSize(QSize(32, 32))  # Tamanho do ícone
             #botao_excluir.setStyleSheet("background-color: red; color white;")
@@ -508,8 +508,6 @@ class MinhaJanela(QMainWindow):
         # QMessageBox.information(self, "Editar", f"Editar formulário de {id_registro}")
         vsql = "SELECT * FROM tb_pessoa WHERE T_CPF = "+ str(cpf)
         resultado = banco.consultar(vsql)
-        print("Resultado ...................")
-        print(resultado)
         self.lenome.setText(resultado[0][0])
         self.lerg.setText(resultado[0][1])
         self.lecpf.setText(resultado[0][2])
@@ -525,13 +523,13 @@ class MinhaJanela(QMainWindow):
         self.leescola.setText(resultado[0][12])
         self.combo_escola_ano.setCurrentText(resultado[0][13])
         self.combo_trabalha.setCurrentText(resultado[0][14])
-        self.lerenda.setText(resultado[0][15])
+        self.lerenda.setText(str(resultado[0][15]))
         self.combo_recbeneficio.setCurrentText(resultado[0][16])
         nomebeneficio=resultado[0][17]
         medicacao=resultado[0][18]
         self.lenomemedicacao.setText(resultado[0][19])
         moradia=resultado[0][20]
-        aluguel=resultado[0][21]
+        aluguel=str(resultado[0][21])
         paredes=resultado[0][22]
         telhado=resultado[0][23]
         piso=resultado[0][24]
@@ -627,7 +625,6 @@ class MinhaJanela(QMainWindow):
         filename = caminho_pdf+resultado[0][0]+"-"+resultado[0][2]+".pdf"
         pdf_generator = relaimp.PDFGenerator(filename)
         pdf_generator.create_pdf(resultado, resultado_composicao)
-        print("Pdf criado com sucesso")
         # Abrir o PDF gerado
         self.open_pdf(filename)
 
@@ -841,7 +838,7 @@ class MinhaJanela(QMainWindow):
         vescola=self.leescola.text()
         vserieano=self.combo_escola_ano.currentText()
         vtrabalha=self.combo_trabalha.currentText()
-        vrenda=self.lerenda.text().replace(".", "").replace(",", "")
+        vrenda=float(self.lerenda.text().replace(".", "").replace(",", "."))
         vrecbeneficio=self.combo_recbeneficio.currentText()
         if vrecbeneficio == "SIM":
             if self.combo_nomebeneficio.currentText() == "Outros":
@@ -854,9 +851,9 @@ class MinhaJanela(QMainWindow):
         vnomemedicacao=self.lenomemedicacao.text()
         vmoradia=self.combo_moradia.currentText()
         if vmoradia != "Alugada":
-            valuguel=""
+            valuguel=0
         else:
-            valuguel=self.levalor_aluguel.text().replace(".", "").replace(",", "")
+            valuguel=float(self.levalor_aluguel.text().replace(".", "").replace(",", "."))
         vparedes=self.combo_paredes.currentText()
         if vparedes == "Outros":
             vparedes=self.leparede_outro.text()
@@ -887,7 +884,7 @@ class MinhaJanela(QMainWindow):
             QMessageBox.critical(self, "Erro Crítico","Nome de Benefício deve ser definido !!!", QMessageBox.StandardButton.Ok)
         elif self.combo_medicacao.currentText() == "SIM" and len(vnomemedicacao) == 0:
             QMessageBox.critical(self, "Erro Crítico","Nome da Medicação deve ser informada !!!", QMessageBox.StandardButton.Ok)
-        elif self.combo_moradia.currentText() == "Alugada" and len(valuguel) == 0:
+        elif self.combo_moradia.currentText() == "Alugada" and valuguel == 0:
             QMessageBox.critical(self, "Erro Crítico","Valor do aluguel deve ser informado !!!", QMessageBox.StandardButton.Ok)
         elif self.combo_paredes.currentText() == "Outros" and len(vparedes) == 0:
             QMessageBox.critical(self, "Erro Crítico","Tipo de  Parede deve ser informada !!!", QMessageBox.StandardButton.Ok)
@@ -896,8 +893,7 @@ class MinhaJanela(QMainWindow):
         elif self.combo_piso.currentText() == "Outros" and len(vpiso) == 0:
             QMessageBox.critical(self, "Erro Crítico","Tipo de Piso deve ser informado!!!", QMessageBox.StandardButton.Ok)
         else:
-            vsql="INSERT INTO tb_pessoa (T_NOME, T_RG, T_CPF, T_MAE, T_CPFMAE, T_PAI, T_CPFPAI, N_BAIRRO, T_NIS, T_FONE, T_CEP, T_GRAU_ENSINO, T_ESCOLA, T_SERIE_ANO, T_TRABALHA, T_RENDA, T_RECBENEFICIO, T_NOMEBENEFICIO, T_MEDICACAO, T_NOMEMEDICACAO, T_MORADIA, T_VALOR_ALUGUEL, T_PAREDES, T_TELHADO, T_PISO, T_OBS, T_ENDE, T_DATA_INS, T_DATA_MOD) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')" %(vnome, vrg, vcpf, vmae, vcpfmae, vpai, vcpfpai, vbairro[0], vnis, vfone, vcep, vgrau_ensino, vescola, vserieano, vtrabalha, vrenda, vrecbeneficio, vnomebeneficio, vmedicacao, vnomemedicacao, vmoradia, valuguel, vparedes, vtelhado, vpiso, vobs, vendereco, data_atual, data_atual)
-            print(vsql)
+            vsql="INSERT INTO tb_pessoa (T_NOME, T_RG, T_CPF, T_MAE, T_CPFMAE, T_PAI, T_CPFPAI, N_BAIRRO, T_NIS, T_FONE, T_CEP, T_GRAU_ENSINO, T_ESCOLA, T_SERIE_ANO, T_TRABALHA, T_RENDA, T_RECBENEFICIO, T_NOMEBENEFICIO, T_MEDICACAO, T_NOMEMEDICACAO, T_MORADIA, T_VALOR_ALUGUEL, T_PAREDES, T_TELHADO, T_PISO, T_OBS, T_ENDE, T_DATA_INS, T_DATA_MOD) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', '%s', '%s', '%s', '%s', %s, '%s', '%s', '%s', '%s', '%s', '%s', '%s')" %(vnome, vrg, vcpf, vmae, vcpfmae, vpai, vcpfpai, vbairro[0], vnis, vfone, vcep, vgrau_ensino, vescola, vserieano, vtrabalha, vrenda, vrecbeneficio, vnomebeneficio, vmedicacao, vnomemedicacao, vmoradia, valuguel, vparedes, vtelhado, vpiso, vobs, vendereco, data_atual, data_atual)
             banco.atualizar(vsql)
             self.gravar_composicao()
             self.limpar_dados()
@@ -953,7 +949,7 @@ class MinhaJanela(QMainWindow):
         vescola=self.leescola.text()
         vserieano=self.combo_escola_ano.currentText()
         vtrabalha=self.combo_trabalha.currentText()
-        vrenda=self.lerenda.text().replace(".", "").replace(",", "")
+        vrenda=self.lerenda.text().replace(".", "").replace(",", ".")
         vrecbeneficio=self.combo_recbeneficio.currentText()
         if vrecbeneficio == "SIM":
             if self.combo_nomebeneficio.currentText() == "Outros":
@@ -966,9 +962,9 @@ class MinhaJanela(QMainWindow):
         vnomemedicacao=self.lenomemedicacao.text()
         vmoradia=self.combo_moradia.currentText()
         if vmoradia != "Alugada":
-            valuguel=""
+            valuguel=0
         else:
-            valuguel=self.levalor_aluguel.text().replace(".", "").replace(",", "")
+            valuguel=float(self.levalor_aluguel.text().replace(".", "").replace(",", "."))
         print("Valor do alguel...")
         print(valuguel)   
         vparedes=self.combo_paredes.currentText()
@@ -981,7 +977,6 @@ class MinhaJanela(QMainWindow):
         if vpiso == "Outros":
             vpiso=self.lepiso_outro.text()     
         vobs=self.data_observacao.replace("'", "")
-        print(vobs)
         vsql="SELECT N_ID FROM tb_bairro WHERE T_BAIRRO = "+ '"' + vbairro + '"'
         vbairro=[row[0] for row in banco.consultar(vsql)]
         
@@ -999,7 +994,7 @@ class MinhaJanela(QMainWindow):
             QMessageBox.critical(self, "Erro Crítico","Nome de Benefício deve ser definido !!!", QMessageBox.StandardButton.Ok)
         elif self.combo_medicacao.currentText() == "SIM" and len(vnomemedicacao) == 0:
             QMessageBox.critical(self, "Erro Crítico","Nome da Medicação deve ser informada !!!", QMessageBox.StandardButton.Ok)
-        elif self.combo_moradia.currentText() == "Alugada" and len(valuguel) == 0:
+        elif self.combo_moradia.currentText() == "Alugada" and valuguel == 0:
             QMessageBox.critical(self, "Erro Crítico","Valor do aluguel deve ser informado !!!", QMessageBox.StandardButton.Ok)
         elif self.combo_paredes.currentText() == "Outros" and len(vparedes) == 0:
             QMessageBox.critical(self, "Erro Crítico","Tipo de  Parede deve ser informada !!!", QMessageBox.StandardButton.Ok)
@@ -1008,8 +1003,7 @@ class MinhaJanela(QMainWindow):
         elif self.combo_piso.currentText() == "Outros" and len(vpiso) == 0:
             QMessageBox.critical(self, "Erro Crítico","Tipo de Piso deve ser informado!!!", QMessageBox.StandardButton.Ok)            
         else:
-            print(vsql)
-            vsql= "UPDATE tb_pessoa SET T_NOME='"+vnome+"',T_RG='"+vrg+"',T_CPF='"+vcpf+"',T_MAE='"+vmae+"',T_CPFMAE='"+vcpfmae+"',T_PAI='"+vpai+"',T_CPFPAI='"+vcpfpai+"',N_BAIRRO="+str(vbairro[0])+",T_NIS='"+vnis+"',T_FONE='"+vfone+"',T_CEP='"+vcep+"',T_GRAU_ENSINO='"+vgrau_ensino+"',T_ESCOLA='"+vescola+"',T_SERIE_ANO='"+vserieano+"',T_TRABALHA='"+vtrabalha+"',T_RENDA='"+vrenda+"',T_RECBENEFICIO='"+vrecbeneficio+"',T_NOMEBENEFICIO='"+vnomebeneficio+"',T_MEDICACAO='"+vmedicacao+"',T_NOMEMEDICACAO='"+vnomemedicacao+"',T_MORADIA='"+vmoradia+"',T_VALOR_ALUGUEL='"+valuguel+"',T_PAREDES='"+vparedes+"',T_TELHADO='"+vtelhado+"',T_PISO='"+vpiso+"',T_OBS='"+vobs+"', T_ENDE='"+vendereco+"', T_DATA_MOD='"+data_atual+"' WHERE T_CPF="+vcpf
+            vsql= "UPDATE tb_pessoa SET T_NOME='"+vnome+"',T_RG='"+vrg+"',T_CPF='"+vcpf+"',T_MAE='"+vmae+"',T_CPFMAE='"+vcpfmae+"',T_PAI='"+vpai+"',T_CPFPAI='"+vcpfpai+"',N_BAIRRO="+str(vbairro[0])+",T_NIS='"+vnis+"',T_FONE='"+vfone+"',T_CEP='"+vcep+"',T_GRAU_ENSINO='"+vgrau_ensino+"',T_ESCOLA='"+vescola+"',T_SERIE_ANO='"+vserieano+"',T_TRABALHA='"+vtrabalha+"',T_RENDA='"+str(vrenda)+"',T_RECBENEFICIO='"+vrecbeneficio+"',T_NOMEBENEFICIO='"+vnomebeneficio+"',T_MEDICACAO='"+vmedicacao+"',T_NOMEMEDICACAO='"+vnomemedicacao+"',T_MORADIA='"+vmoradia+"',T_VALOR_ALUGUEL='"+str(valuguel)+"',T_PAREDES='"+vparedes+"',T_TELHADO='"+vtelhado+"',T_PISO='"+vpiso+"',T_OBS='"+vobs+"', T_ENDE='"+vendereco+"', T_DATA_MOD='"+data_atual+"' WHERE T_CPF="+vcpf
             banco.atualizar(vsql)
             self.gravar_composicao()
             self.consultar()
@@ -1172,7 +1166,6 @@ class MinhaJanela(QMainWindow):
         comp1 = composicao.TableWindow(self, self.data_composicao)  # Passa os dados existentes
         if comp1.exec():
             self.data_composicao = comp1.get_data()  # Atualiza os dados
-            print(self.data_composicao)
     def abrir_observacao(self):
         obs1 = observacao.ObservacaoWindow(self, self.data_observacao)  # Passa os dados existentes
         if obs1.exec():
