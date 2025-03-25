@@ -296,7 +296,8 @@ class PDFGenerator:
         else:
             self.imprimir_linha_tabela(pdf, "TRABALHA: (   ) SIM  ( X ) NÃO", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(105), fundo=colors.white)
             
-        self.imprimir_linha_tabela(pdf, "RENDA FAMILIAR: R$ "+resultado[0][15], linha, fonte="Helvetica", tamanho=10, posicao=self.mp(105), largura_coluna = self.mp(85), fundo=colors.white)
+        renda_string = f"{resultado[0][15]:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        self.imprimir_linha_tabela(pdf, "RENDA FAMILIAR: R$ "+renda_string, linha, fonte="Helvetica", tamanho=10, posicao=self.mp(105), largura_coluna = self.mp(85), fundo=colors.white)
         
        
         linha+=incremento
@@ -387,7 +388,8 @@ class PDFGenerator:
         pdf.rect(x1, y1, x2 - x1, y2 - y1, stroke=1, fill=0)  # Retângulo externo
 
         linha=30+incremento
-        self.imprimir_linha_tabela(pdf, "SE ALUGUEL, QUANTO: R$ "+resultado[0][21], linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
+        aluguel_string = f"{resultado[0][21]:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        self.imprimir_linha_tabela(pdf, "SE ALUGUEL, QUANTO: R$ "+aluguel_string, linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
         
         linha+=incremento
         if resultado[0][22] == "Alvenaria":

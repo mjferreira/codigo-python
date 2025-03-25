@@ -2,6 +2,7 @@ import re, sys, os
 from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QVBoxLayout, QWidget, QPushButton, QLineEdit, QHBoxLayout, QMessageBox, QTableWidget
 from PyQt6.QtWidgets import QTableWidgetItem, QComboBox, QSizePolicy, QDialog, QTextEdit, QScrollArea
 from PyQt6.QtGui import QAction, QIcon, QTextCursor
+from PyQt6.QtGui import QDoubleValidator
 from PyQt6.QtCore import QSize
 from datetime import datetime
 import banco
@@ -285,7 +286,11 @@ class MinhaJanela(QMainWindow):
         self.lerenda = QLineEdit("", self.central_widget)
         self.lerenda.setGeometry(450,linha,90,25)
         self.lerenda.setStyleSheet('background: white; color: black; font-size:18px;')
-        self.lerenda.setInputMask("99.999,00")  # Apenas números e "-" fixo
+        # self.lerenda.setInputMask("99.999,99") 
+        # Configurando um validador para aceitar apenas números
+        validator = QDoubleValidator(0, 99999.99, 2)
+        self.lerenda.setValidator(validator)
+
 
         linha=linha+30
         self.lrecbenefinicio = QLabel("Recebe Benefício:",self.central_widget)
@@ -376,7 +381,11 @@ class MinhaJanela(QMainWindow):
         self.levalor_aluguel = QLineEdit("", self.central_widget)
         self.levalor_aluguel.setGeometry(450,linha,90,25)
         self.levalor_aluguel.setStyleSheet('background: white; color: black; font-size:18px;')
-        self.levalor_aluguel.setInputMask("99.999,00")  # Apenas números e "-" fixo
+        # self.levalor_aluguel.setInputMask("99.999,99")  
+        # Configurando um validador para aceitar apenas números
+        validator = QDoubleValidator(0, 99999.99, 2)
+        self.levalor_aluguel.setValidator(validator)
+
 
         linha=linha+30
         self.lparedes = QLabel("Paredes:",self.central_widget)
@@ -523,13 +532,17 @@ class MinhaJanela(QMainWindow):
         self.leescola.setText(resultado[0][12])
         self.combo_escola_ano.setCurrentText(resultado[0][13])
         self.combo_trabalha.setCurrentText(resultado[0][14])
-        self.lerenda.setText(str(resultado[0][15]))
+        renda=resultado[0][15]
+        renda_string = f"{renda:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        self.lerenda.setText(renda_string)
         self.combo_recbeneficio.setCurrentText(resultado[0][16])
         nomebeneficio=resultado[0][17]
         medicacao=resultado[0][18]
         self.lenomemedicacao.setText(resultado[0][19])
         moradia=resultado[0][20]
-        aluguel=str(resultado[0][21])
+        aluguel=resultado[0][21]
+        aluguel_string = f"{aluguel:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+   
         paredes=resultado[0][22]
         telhado=resultado[0][23]
         piso=resultado[0][24]
@@ -561,7 +574,7 @@ class MinhaJanela(QMainWindow):
             self.lvalor_aluguel.setVisible(False)
             self.levalor_aluguel.setVisible(False)
         else:
-            self.levalor_aluguel.setText(aluguel)
+            self.levalor_aluguel.setText(aluguel_string)
             self.lvalor_aluguel.setVisible(True)
             self.levalor_aluguel.setVisible(True)
 
@@ -838,7 +851,12 @@ class MinhaJanela(QMainWindow):
         vescola=self.leescola.text()
         vserieano=self.combo_escola_ano.currentText()
         vtrabalha=self.combo_trabalha.currentText()
-        vrenda=float(self.lerenda.text().replace(".", "").replace(",", "."))
+        #vrenda=float(self.lerenda.text().replace(".", "").replace(",", "."))
+        renda=self.lerenda.text().replace(".", "").replace(",", ".")
+        if len(renda) == 0:
+            vrenda=0
+        else:
+            vrenda=float(renda)
         vrecbeneficio=self.combo_recbeneficio.currentText()
         if vrecbeneficio == "SIM":
             if self.combo_nomebeneficio.currentText() == "Outros":
@@ -853,7 +871,12 @@ class MinhaJanela(QMainWindow):
         if vmoradia != "Alugada":
             valuguel=0
         else:
-            valuguel=float(self.levalor_aluguel.text().replace(".", "").replace(",", "."))
+            aluguel=self.levalor_aluguel.text().replace(".", "").replace(",", ".")
+            if len(aluguel) == 0:
+                valuguel=0
+            else:    
+                valuguel=float(self.levalor_aluguel.text().replace(".", "").replace(",", "."))
+            #valuguel=float(self.levalor_aluguel.text().replace(".", "").replace(",", "."))
         vparedes=self.combo_paredes.currentText()
         if vparedes == "Outros":
             vparedes=self.leparede_outro.text()
@@ -949,7 +972,11 @@ class MinhaJanela(QMainWindow):
         vescola=self.leescola.text()
         vserieano=self.combo_escola_ano.currentText()
         vtrabalha=self.combo_trabalha.currentText()
-        vrenda=self.lerenda.text().replace(".", "").replace(",", ".")
+        renda=self.lerenda.text().replace(".", "").replace(",", ".")
+        if len(renda) == 0:
+            vrenda=0
+        else:
+            vrenda=float(renda)
         vrecbeneficio=self.combo_recbeneficio.currentText()
         if vrecbeneficio == "SIM":
             if self.combo_nomebeneficio.currentText() == "Outros":
@@ -964,9 +991,11 @@ class MinhaJanela(QMainWindow):
         if vmoradia != "Alugada":
             valuguel=0
         else:
-            valuguel=float(self.levalor_aluguel.text().replace(".", "").replace(",", "."))
-        print("Valor do alguel...")
-        print(valuguel)   
+            aluguel=self.levalor_aluguel.text().replace(".", "").replace(",", ".")
+            if len(aluguel) == 0:
+                valuguel=0
+            else:    
+                valuguel=float(self.levalor_aluguel.text().replace(".", "").replace(",", "."))
         vparedes=self.combo_paredes.currentText()
         if vparedes == "Outros":
             vparedes=self.leparede_outro.text()
@@ -1049,9 +1078,7 @@ class MinhaJanela(QMainWindow):
     def cpf_existe(self, cpf):
         """Verifica se o CPF já existe no banco de dados."""
         vsql = "SELECT T_CPF FROM tb_pessoa WHERE T_CPF = "+ str(cpf)
-        #print(vsql)
         resultado = banco.consultar(vsql)
-        #print(resultado)
         if len(resultado) == 0:
             return False
         else:
@@ -1067,9 +1094,7 @@ class MinhaJanela(QMainWindow):
             self.combo_bairro.setCurrentIndex(-1)
         else:
             vsql="SELECT N_ID FROM tb_zona WHERE T_ZONA = " + '"' + str(zona_selecionada)+ '"'
-            #print(vsql)
             zona_id=[row[0] for row in banco.consultar(vsql)]
-            #print(zona_id)
             vsql="SELECT T_BAIRRO FROM tb_bairro WHERE N_ZONA = "+ str(zona_id[0])
             bairros = [row[0] for row in banco.consultar(vsql)]
             self.combo_bairro.clear()
@@ -1170,28 +1195,23 @@ class MinhaJanela(QMainWindow):
         obs1 = observacao.ObservacaoWindow(self, self.data_observacao)  # Passa os dados existentes
         if obs1.exec():
             self.data_observacao = obs1.get_text()  # Atualiza os dados
-            print(self.data_observacao)
     def gravar_composicao(self):
         """Salva os dados da tabela no banco de dados"""
         # Limpa os dados antes de salvar para evitar duplicação
         vcpf=self.lecpf.text().replace("-", "").replace(".", "")
         vsql="DELETE FROM tb_composicao WHERE T_CPF = "+"'"+vcpf+"'"
-        print(vsql)
         banco.atualizar(vsql)
         for row in self.data_composicao:
             vnome = row[0]
             vlocal = row[2]
             vparentesco = row[1]
             vsql="INSERT INTO tb_composicao (T_CPF, T_NOME, T_PARENTESCO, T_ESCOLA_TRABALHO) VALUES ("+"'"+vcpf+"'"+","+"'"+vnome+"'"+","+"'"+vparentesco+"'"+","+"'"+vlocal+"'"+")"
-            print(vsql)
             banco.atualizar(vsql)
     def carregar_composicao(self):
         """Carrega os dados do banco de dados para a tabela"""
         vcpf=self.lecpf.text().replace("-", "").replace(".", "")
         vsql="SELECT T_NOME, T_PARENTESCO, T_ESCOLA_TRABALHO  FROM tb_composicao WHERE T_CPF ="+str(vcpf)
-        print(vsql)
         rows = banco.consultar(vsql)
-        print(rows)
         self.data_composicao = []
         # Adiciona os dados à tabela
         for row in rows:
