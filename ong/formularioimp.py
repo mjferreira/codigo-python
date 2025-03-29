@@ -70,12 +70,20 @@ class MinhaJanela(QMainWindow):
         # Conectar a ação "Sair" para fechar a janela
         acao_sair.triggered.connect(self.close)
 
+        menu_imp = menu_bar.addMenu("Imprimir")
+        # Criar ações para o menu
+        acao_mostrar = QAction("ListaPresença", self)
+        acao_mostrar.triggered.connect(self.imprimir_lista)
+        # Adicionar ações ao menu
+        menu_imp.addAction(acao_mostrar)
+
         menu_sobre = menu_bar.addMenu("Sobre")
         # Criar ações para o menu
         acao_mostrar = QAction("Versão", self)
         acao_mostrar.triggered.connect(self.mostrar_mensagem_sobre)
         # Adicionar ações ao menu
         menu_sobre.addAction(acao_mostrar)
+
         
 
         
@@ -638,6 +646,15 @@ class MinhaJanela(QMainWindow):
         filename = caminho_pdf+resultado[0][0]+"-"+resultado[0][2]+".pdf"
         pdf_generator = relaimp.PDFGenerator(filename)
         pdf_generator.create_pdf(resultado, resultado_composicao)
+        # Abrir o PDF gerado
+        self.open_pdf(filename)
+
+    def imprimir_lista(self):
+        vsql = "SELECT T_NOME, T_CPF, T_NIS FROM tb_pessoa"
+        resultado = banco.consultar(vsql)
+        filename = caminho_pdf+"Lista_Presenca"+".pdf"
+        pdf_generator = relaimp.PDFGenerator(filename)
+        pdf_generator.create_pdf_lista(resultado)
         # Abrir o PDF gerado
         self.open_pdf(filename)
 

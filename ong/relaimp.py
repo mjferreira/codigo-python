@@ -39,6 +39,22 @@ class PDFGenerator:
     def cabecalho(self, pdf):
         pdf.drawImage(caminho_icones+"/logo.png",self.mp(100), self.altura_pagina-self.mp(15),self.mp(10),self.mp(10))
         self.imprimir_texto(pdf, nome_fantasia, self.altura_pagina-self.mp(20), tamanho=8, posicao=0)   
+    def cabecalho_lista(self, pdf):
+        self.cabecalho(pdf)
+        # Definindo as coordenadas da borda
+        x1, y1 = self.mp(10), self.mp(25)  # Ponto inferior esquerdo
+        x2, y2 = self.largura_pagina-x1, self.altura_pagina-y1  # Ponto superior direito
+        # Desenhar a borda externa (linha dupla)
+        pdf.setStrokeColorRGB(0, 0, 0)  # Cor da linha (preto)
+        pdf.setLineWidth(1)  # Largura da linha
+        pdf.rect(x1, y1, x2 - x1, y2 - y1, stroke=1, fill=0)  # Retângulo externo
+        #Largura: 210 mm (milímetros) ou aproximadamente 8,27 polegadas.
+        #Altura: 297 mm (milímetros) ou aproximadamente 11,69 polegadas.   
+        pdf.setLineWidth(1)  # Largura da linha     
+        linha=25+incremento        
+        self.imprimir_linha_tabela(pdf, "Nome", linha, fonte="Helvetica-Bold", tamanho=10, posicao=self.mp(10), largura_coluna = self.largura_pagina-(2*self.mp(10)), fundo=colors.lightgrey)
+        self.imprimir_linha_tabela(pdf, "CPF", linha, fonte="Helvetica-Bold", tamanho=10, posicao=self.mp(115), largura_coluna = self.mp(25), fundo=colors.lightgrey)
+        self.imprimir_linha_tabela(pdf, "                   Assinatura", linha, fonte="Helvetica-Bold", tamanho=10, posicao=self.mp(140), largura_coluna = self.mp(60), fundo=colors.lightgrey)
 
     def pagina1_vazia(self, pdf):
        # Definindo as coordenadas da borda
@@ -377,8 +393,7 @@ class PDFGenerator:
             self.imprimir_linha_tabela(pdf, "CASA: (   ) PRÓPRIA  ( X ) ALUGADA  (   ) CEDIDA", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
         else:
             self.imprimir_linha_tabela(pdf, "CASA: (   ) PRÓPRIA  (   ) ALUGADA  ( X ) CEDIDA", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(20), largura_coluna = self.mp(170), fundo=colors.white)
-    
-
+   
     def pagina2(self,pdf, resultado, resultado_composicao):
         x1, y1 = self.mp(20), self.mp(141)  # Ponto inferior esquerdo
         x2, y2 = self.largura_pagina-x1, self.altura_pagina-self.mp(30) # Ponto superior direito
@@ -495,3 +510,20 @@ class PDFGenerator:
         self.pagina2(c, resultado, resultado_composicao)
         self.rodape(c)
         c.save()
+
+    def create_pdf_lista(self, resultado):
+        pdf = canvas.Canvas(self.filename, pagesize=A4)
+        self.cabecalho_lista(pdf)
+        linha=32
+        for nome, cpf, nis in resultado:
+            linha+=incremento
+            self.imprimir_linha_tabela(pdf, nome, linha, fonte="Helvetica", tamanho=10, posicao=self.mp(10), largura_coluna = self.largura_pagina-(2*self.mp(10)), fundo=colors.white)
+            self.imprimir_linha_tabela(pdf, cpf, linha, fonte="Helvetica", tamanho=10, posicao=self.mp(115), largura_coluna = self.mp(25), fundo=colors.white)
+            # self.imprimir_linha_tabela(pdf, nis, linha, fonte="Helvetica", tamanho=10, posicao=self.mp(160), largura_coluna = self.mp(55), fundo=colors.white)
+            self.imprimir_linha_tabela(pdf, "", linha, fonte="Helvetica", tamanho=10, posicao=self.mp(140), largura_coluna = self.mp(60), fundo=colors.white)
+            if linha >= 265:
+                pdf.showPage()
+                self.cabecalho_lista(pdf)
+                linha=32
+        self.rodape(pdf)
+        pdf.save()
