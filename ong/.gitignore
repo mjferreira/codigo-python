@@ -1,4 +1,0 @@
-.env_*
-__pycache__
-*.pyc
-config.ini

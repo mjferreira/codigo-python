@@ -514,6 +514,7 @@ class PDFGenerator:
     def create_pdf_lista(self, resultado):
         pdf = canvas.Canvas(self.filename, pagesize=A4)
         self.cabecalho_lista(pdf)
+        self.rodape(pdf)
         linha=32
         for nome, cpf, nis in resultado:
             linha+=incremento
@@ -524,6 +525,6 @@ class PDFGenerator:
             if linha >= 265:
                 pdf.showPage()
                 self.cabecalho_lista(pdf)
+                self.rodape(pdf)
                 linha=32
-        self.rodape(pdf)
         pdf.save()
